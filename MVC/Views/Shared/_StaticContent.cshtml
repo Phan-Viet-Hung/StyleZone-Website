@@ -1,0 +1,133 @@
+﻿@using API.DomainCusTomer.DTOs.TrangChu
+@model List<API.DomainCusTomer.DTOs.TrangChu.HomeProductCustomerDto>
+@if (Model != null && Model.Any())
+{
+    <div class="container py-5">
+        <h2 class="text-center fw-bold mb-4">TIN TỨC & KHUYẾN MÃI</h2>
+        <div class="row justify-content-center g-4">
+
+            @foreach (var promo in Model)
+            {
+                <div class="col-md-4">
+                    <a asp-action="Detail" asp-controller="TinTucCustomer" asp-route-id="@promo.Id" class="text-decoration-none text-dark d-block h-100">
+                        <div class="bg-white p-3 shadow-sm h-100 promo-card" style="border: 1px solid #eee;">
+                            <img src="@($"https://localhost:7257/{(promo.ImageUrl ?? "default1.jpg")}")" class="img-fluid mb-3" style="width: 100%; height: 200px; object-fit: cover;" />
+                            <h6 style="font-weight: 700;">@promo.Name</h6>
+
+                            <p class="promo-description" style="font-size: 14px; margin-bottom: 0;">
+                                @promo.CategoryName  @* Thay thế bằng ShortDescription nếu DTO của bạn có *@
+                            </p>
+
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-controller="TinTucCustomer" asp-action="Index" class="btn btn-outline-dark px-4">Xem thêm</a>
+        </div>
+    </div>
+}
+
+@section Styles {
+    <style>
+        /* Tổng thể container */
+        .promo-section {
+            background: #f9f9f9;
+            padding: 60px 15px;
+        }
+
+        .promo-section h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #0d6efd;
+            margin-bottom: 40px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .promo-section h2::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 4px;
+            background-color: #0d6efd;
+            bottom: -10px;
+            left: 20%;
+            border-radius: 5px;
+        }
+
+        /* Card layout */
+        .promo-card {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .promo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .promo-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .promo-card:hover img {
+            transform: scale(1.03);
+        }
+
+        .promo-card h6 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 12px;
+            color: #333;
+        }
+
+        .promo-description {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 6px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        /* Xem thêm button */
+        .promo-section .btn-outline-dark {
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .promo-section .btn-outline-dark:hover {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+
+        /* Responsive ảnh */
+        @@media (max-width: 768px) {
+            .promo-card img {
+                height: 180px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .promo-card img {
+                height: 160px;
+            }
+
+            .promo-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+}

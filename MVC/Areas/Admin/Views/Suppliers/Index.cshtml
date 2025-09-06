@@ -1,0 +1,125 @@
+﻿@model List<API.Domain.DTOs.SupplierDto>
+
+@{
+    ViewData["Title"] = "Danh sách nhà cung cấp";
+}
+
+@section Styles {
+    <style>
+        .copy-id {
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+    </style>
+
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <!-- Tiêu đề -->
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh sách nhà cung cấp</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách bảng -->
+        <div class="tables-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-style mb-30">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <a asp-action="Create" class="btn btn-primary btn-sm">
+                                    <i class="lni lni-plus me-1" style="font-size: 0.85em;"></i> Thêm nhà cung cấp
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a asp-action="Export" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="table-wrapper table-responsive">
+                            <table id="supplierTable" class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 150px;">ID</th>
+                                        <th>Tên</th>
+                                        <th>Liên hệ</th>
+                                        <th>Email</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var supplier in Model)
+                                    {
+                                        <tr>
+                                            <td title="@supplier.Id">
+                                                <span class="copy-id" data-id="@supplier.Id">
+                                                    @supplier.Id.ToString().Substring(0, 8)
+                                                </span>
+                                            </td>
+                                            <td>@supplier.Name</td>
+                                            <td>@supplier.Contact</td>
+                                            <td><a href="mailto:@supplier.Email">@supplier.Email</a></td>
+                                            <td>@supplier.Address</td>
+                                            
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@supplier.Id"
+                                                   class="lni lni-pencil text-primary"
+                                                   title="Chỉnh sửa"></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#supplierTable').DataTable({
+                language: {
+                    search: "Tìm kiếm:",
+                    lengthMenu: "Hiển thị _MENU_ dòng",
+                    info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                    paginate: {
+                        first: "Đầu",
+                        last: "Cuối",
+                        next: "→",
+                        previous: "←"
+                    },
+                    zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                    infoEmpty: "Không có dữ liệu",
+                    infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+                },
+                order: [[1, 'asc']]
+            });
+        });
+
+            // Copy ID to clipboard on click
+            $(document).on('click', '.copy-id', function () {
+                const fullId = $(this).data('id');
+                navigator.clipboard.writeText(fullId)
+                    .then(() => {
+                        alert('Đã sao chép ID: ' + fullId);
+                    })
+                    .catch(err => {
+                        console.error('Không thể sao chép: ', err);
+                    });
+            });
+    </script>
+}

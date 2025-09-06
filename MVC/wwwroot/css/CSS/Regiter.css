@@ -1,0 +1,150 @@
+.register-container {
+    max-width: 480px;
+    background-color: white;
+    padding: 40px 30px;
+    margin: 60px auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.register-title {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.underline-title {
+    height: 2px;
+    background-color: red;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+label {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #777;
+}
+
+.form-control {
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    box-shadow: none;
+    padding-left: 0;
+    font-size: 15px;
+}
+
+    .form-control:focus {
+        border-color: black;
+        box-shadow: none;
+    }
+
+.btn-register {
+    width: 100%;
+    border-radius: 0;
+    border: 1px solid black;
+    font-weight: bold;
+    background-color: white;
+    color: black;
+    transition: all 0.3s ease;
+    padding: 10px;
+}
+
+    .btn-register:hover {
+        background-color: black;
+        color: white;
+    }
+
+.btn-google {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #444;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+    .btn-google:hover {
+        background-color: #f1f1f1;
+    }
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.bottom-link {
+    font-size: 14px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+    .bottom-link a {
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+.text-danger {
+    font-size: 14px;
+}
+
+/* Icon con mắt */
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #555;
+    z-index: 2;
+}
+
+/* Ẩn icon mặc định trình duyệt */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+    display: none !important;
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+    .register-container {
+        margin: 20px 10px;
+        padding: 25px 15px;
+    }
+
+    .register-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-size: 11px;
+    }
+
+    .form-control {
+        font-size: 16px;
+    }
+
+    .btn-register,
+    .btn-google {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .bottom-link {
+        font-size: 13px;
+    }
+}

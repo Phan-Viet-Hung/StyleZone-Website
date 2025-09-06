@@ -1,0 +1,135 @@
+﻿@using API.DomainCusTomer.DTOs.QuanLyDonHangCustomerDto
+@model QuanLyDonHangCustomerDto
+@{
+    ViewData["Title"] = "Tracuudonhang";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+
+}
+
+<link rel="stylesheet" href="~/css/CSS/DonMua.css" />
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tra cứu đơn hàng</li>
+    </ol>
+</nav>
+
+<div class="container my-4">
+    <!-- Form nhập mã đơn hàng -->
+    <form method="get" asp-action="Tracuudonhang" asp-controller="MoMoThanhtoancustomer" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="orderid" class="form-control" placeholder="Nhập mã đơn hàng..." />
+            <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+        </div>
+    </form>
+
+
+    @if (Model != null)
+    {
+        @if (TempData["CancelGuestSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["CancelGuestSuccess"]</div>
+        }
+        @if (TempData["CancelGuestError"] != null)
+        {
+            <div class="alert alert-danger">@TempData["CancelGuestError"]</div>
+        }
+        <section class="order-section mb-4 border rounded p-3">
+            <div class="order-header d-flex justify-content-between align-items-center">
+                
+                <div class="shop-info">
+                    <i class="fas fa-store text-warning"></i>
+                    <strong>StyleZone Shop Uy Tín Số 1 Việt Nam</strong>
+                </div>
+                <span class="text-warning fw-bold">@Model.Status</span>
+            </div>
+
+            @foreach (var item in Model.Details)
+            {
+                <div class="order-item d-flex align-items-center mt-3">
+                    <img src="@($"https://localhost:7257/{(item.ProductDetail.Images.FirstOrDefault().Url ?? "default1.jpg")}")" alt="@item.ProductDetail.Name" style="width:80px;height:80px;object-fit:cover" class="me-3" />
+
+                    <div class="item-info flex-grow-1">
+                        <div class="title fw-semibold">@item.ProductDetail.Name</div>
+                        <div class="quantity text-muted">Số lượng: x @item.Quantity</div>
+                        <div class="quantity">Màu: @item.ProductDetail.Color?.Name | Size: @item.ProductDetail.Size?.Name</div>
+                        <div class="price text-danger">₫@string.Format("{0:N0}", item.Price)</div>
+                    </div>
+                </div>
+            }
+
+            <div class="order-footer mt-3 d-flex justify-content-between">
+                <span class="total-label fw-bold"></span>
+                <span class="total-price text-danger fw-bold">
+                    <h5>Thành tiền: @string.Format("{0:N0}", Model.TotalAmount)</h5>
+                </span>
+            </div>
+            @if (Model.Status == DAL_Empty.Models.OrderStatus.Pending)
+            {
+                <button type="button" class="btn btn-danger" style="padding: 6px 20px; font-size: 18px;"
+                        data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                    Hủy
+                </button>
+            }
+            <!-- Modal Nhập Lý Do Hủy -->
+            <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cancelOrderModalLabel">Lý do hủy đơn hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+
+                        <form asp-action="CancelOrder" asp-controller="MoMoThanhtoancustomer" method="post" class="bg-white rounded-3 shadow-sm p-3">
+                            <div class="modal-body">
+                                <div class="mb-3">
+
+                                    <textarea class="form-control border-1 rounded-3"
+                                          id="Decription"
+                                          name="Decription"
+                                          rows="3"
+                                          placeholder="Nhập lý do bạn muốn hủy..."
+                                          required></textarea>
+                                </div>
+                                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                            </div>
+
+                            <div class="modal-footer border-0 d-flex justify-content-end gap-2">
+                                <button type="submit" class="btn btn-primary">Xác nhận hủy</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                </div>
+
+                <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="cancelOrderModalLabel">Lý do hủy đơn hàng</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                            </div>
+                            <div class="modal-body">
+                                <textarea class="form-control" rows="3" placeholder="Nhập lý do hủy..."></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" class="btn btn-danger">Xác nhận hủy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    }
+    else if (ViewBag.Error == null)
+    {
+        <p class="text-center text-muted mt-4">Chưa có kết quả tìm kiếm.</p>
+    }
+    else
+    {
+        <p class="text-center text-muted mt-4">Chưa có kết quả tìm kiếm.</p>
+    }
+</div>

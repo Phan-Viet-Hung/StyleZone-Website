@@ -1,0 +1,74 @@
+﻿@using API.DomainCusTomer.DTOs.QuanLyDonHangCustomerDto
+@model List<QuanLyDonHangCustomerDto>
+@{
+    ViewData["Title"] = "ListDonHangProcessing";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/CSS/DonMua.css" rel="stylesheet" />
+
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Đang xử lý</li>
+    </ol>
+</nav>
+
+<div class="container my-4">
+    <!-- Tabs -->
+    <div class="sticky-tabs bg-white">
+        <ul class="nav nav-tabs" id="orderTabs">
+            <li class="nav-item"><a asp-action="ListDonHang" asp-controller="DonMuaCustomer" class="nav-link">Tất cả</a></li>
+            <li class="nav-item"><a asp-action="ListDonHangPending" asp-controller="DonMuaCustomer" class="nav-link">Chờ xác nhận</a></li>
+            <li class="nav-item"><a asp-action="ListDonHangConfirmed" asp-controller="DonMuaCustomer" class="nav-link">Đã xác nhận</a></li>
+            <li class="nav-item"><a class="nav-link active">Đang xử lý</a></li>
+            <li class="nav-item"><a asp-action="ListDonHangShipping" asp-controller="DonMuaCustomer" class="nav-link">Đang giao</a></li>
+            <li class="nav-item"><a asp-action="ListDonHangDelivered" asp-controller="DonMuaCustomer" class="nav-link">Đã giao</a></li>
+            <li class="nav-item"><a asp-action="ListDonHangCancelled" asp-controller="DonMuaCustomer" class="nav-link">Đã hủy</a></li>
+        </ul>
+    </div>
+
+    <div id="tabContent">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var order in Model)
+            {
+                <section class="order-section mb-4 border rounded p-3">
+                    <div class="order-header d-flex justify-content-between align-items-center">
+                        <div class="shop-info">
+                            <i class="fas fa-store text-warning"></i>
+                            <strong>StyleZone Shop Uy Tín Số 1 Việt Nam</strong>
+                        </div>
+                        <span class="text-warning fw-bold">@order.Status</span>
+                    </div>
+
+                    @foreach (var item in order.Details)
+                    {
+                        <div class="order-item d-flex align-items-center mt-3">
+                            <img src="@($"https://localhost:7257/{(item.ProductDetail.Images.FirstOrDefault().Url ?? "default1.jpg")}")" alt="@item.ProductDetail.Name" style="width:80px;height:80px;object-fit:cover" class="me-3" />
+                            <div class="item-info flex-grow-1">
+                                <div class="title fw-semibold">@item.ProductDetail.Name</div>
+                                <div class="quantity text-muted">Số lượng: x @item.Quantity</div>
+                                <div class="quantity">Màu: @item.ProductDetail.Color.Name | Size: @item.ProductDetail.Size.Name</div>
+                                <div class="price text-danger">₫@string.Format("{0:N0}", item.Price)</div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="order-footer mt-3 d-flex justify-content-between">
+                        <span class="total-label fw-bold"></span>
+                        <span class="total-price text-danger fw-bold">
+                            <h5> Thành tiền: @string.Format("{0:N0}", order.TotalAmount)</h5>
+                        </span>
+                    </div>
+                </section>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted mt-4">Không có đơn hàng nào đang xử lý</p>
+        }
+    </div>
+</div>
+

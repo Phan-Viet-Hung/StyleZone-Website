@@ -1,0 +1,90 @@
+﻿@model API.DomainCusTomer.Request.AccountCustomerRequest.LoginnCustomerRequest
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<link href="~/css/CSS/Login.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Login</li>
+    </ol>
+</nav>
+<div class="login-container">
+    <div class="login-title">Đăng nhập</div>
+    <div class="underline-title"></div>
+    <div class="mb-4">
+        <p style="color:red">@ViewBag.Error</p>
+    </div>
+    <form asp-action="Login" asp-controller="LoginAccount" method="post">
+        <div class="mb-3">
+            <label for="email" class="form-label">Tài khoản</label>
+            <input asp-for="UserName" class="form-control" id="email" placeholder="Nhập tài khoản" required />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="password" class="form-label">Mật khẩu</label>
+            <div class="position-relative">
+                <input asp-for="Password" class="form-control" type="password" id="password" placeholder="Nhập Mật khẩu" />
+                <i class="fa-regular fa-eye toggle-password position-absolute end-0 top-50 translate-middle-y me-2" toggle="#password" style="cursor:pointer;"></i>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <button type="submit" class="btn btn-login">Đăng nhập</button>
+
+        <div class="divider text-center my-3">Hoặc</div>
+        <a style="text-decoration:none" asp-action="LoginByGoogle" asp-controller="LoginAccount">
+            <button type="button" class="btn-google">
+
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon">
+
+                Đăng nhập bằng Google
+            </button>
+        </a>
+        <div class="bottom-link">
+            Bạn chưa có tài khoản? <a asp-action="SendOtppRegister" asp-controller="LoginAccount">Đăng ký ngay</a><br>
+            <a asp-action="SendOtp" asp-controller="LoginAccount">Quên mật khẩu?</a>
+        </div>
+    </form>
+</div>
+@if (TempData["errorgoogle"] != null)
+{
+    <script>
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: '@Html.Raw(TempData["errorgoogle"])',
+            showConfirmButton: false,
+            timer: 6000,
+            timerProgressBar: true,
+            background: '#d4edda', // nền xanh nhạt
+            color: '#155724',      // chữ xanh đậm
+                customClass: {
+                        popup: 'animated tada faster' // hiệu ứng nổ
+                    }
+                });
+    </script>
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Toggle show/hide password
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function () {
+                const input = document.querySelector(this.getAttribute('toggle'));
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+}
+
+

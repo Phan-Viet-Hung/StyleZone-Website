@@ -1,0 +1,125 @@
+﻿@model MVC.Models.HomepageViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<div id="popupPromo" class="popup-overlay">
+    <div class="popup-content">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <img src="~/css/Image/anhkhuyenmaihe.jpg" alt="Khuyến mãi hè" class="img-fluid" />
+    </div>
+</div>
+
+@* Hero Banner *@
+<div id="heroCarousel" class="carousel slide hero-banner" data-bs-ride="carousel" data-bs-interval="5000">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="~/css/Image/bannerchinh2.png" alt="Banner 1" class="d-block w-100 object-fit-cover" />
+        </div>
+        <div class="carousel-item">
+            <img src="~/css/Image/bannernuchinh.png" alt="Banner 2" class="d-block w-100 object-fit-cover" />
+        </div>
+        <div class="carousel-item">
+            <img src="~/css/Image/slideshow_5.webp" alt="Banner 3" class="d-block w-100 object-fit-cover" />
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+@* Môn thể thao *@
+<div class="container">
+    <div class="text-center">
+        <h2 class="section-title">MÔN THỂ THAO</h2>
+    </div>
+
+    <div class="carousel-wrapper">
+        <button id="prevBtn" class="nav-btn" aria-label="Previous">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div id="carousel" class="carousel-container w-100">
+            <a asp-controller="TheThaoCustomer" asp-action="ChayboCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/chaybo.jpg" class="carousel-img" alt="Chạy bộ" />
+                <div class="carousel-caption-custom">Chạy bộ</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="PICKLEBALLCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/pickleball.jpg" class="carousel-img" alt="Pickleball" />
+                <div class="carousel-caption-custom">Pickleball</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="BongRoCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/bongro.jpg" class="carousel-img" alt="Bóng rổ" />
+                <div class="carousel-caption-custom">Bóng rổ</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="BongDaCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/bongda.jpg" class="carousel-img" alt="Bóng đá" />
+                <div class="carousel-caption-custom">Bóng đá</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="CauLongCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/caulong.jpg" class="carousel-img" alt="Cầu lông" />
+                <div class="carousel-caption-custom">Cầu lông</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="GolfCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/golf.jpg" class="carousel-img" alt="Golf" />
+                <div class="carousel-caption-custom">Golf</div>
+            </a>
+            <a asp-controller="TheThaoCustomer" asp-action="TapLuyenCustomer" class="carousel-item-custom">
+                <img src="~/css/Image/gym.jpg" class="carousel-img" alt="Training" />
+                <div class="carousel-caption-custom">Tập Luyện</div>
+            </a>
+
+        </div>
+
+        <button id="nextBtn" class="nav-btn" aria-label="Next">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+@* Banner cuối *@
+<div class="container my-5">
+    <div class="container-fluid p-0 mb-4">
+        <img src="~/css/Image/background-2-9-thumbnail.jpg" alt="Pickleball Banner" class="img-fluid w-100"
+             style="max-height: 600px; object-fit: cover;" />
+    </div>
+</div>
+
+
+@if (Model?.FeaturedProducts != null)
+{
+    var list = Model.FeaturedProducts.ToList();
+
+    // 1. SẢN PHẨM RA MẮT
+    if (list.Count > 0)
+    {
+        @await Html.PartialAsync("_ProductSection", list[0])
+    }
+
+    // 2. VIDEO
+    <div class="container my-5">
+        <h2 class="text-center mb-4">STYLEZONE|CHÁY THEO PHONG CÁCH CỦA BẠN</h2>
+        <div class="ratio ratio-16x9 video-container">
+            <video controls autoplay muted loop>
+                <source src="~/css/Image/Sony A7IV - Sony 35mm 1.8 - Basketball Commercial Video -.mp4" type="video/mp4" />
+            </video>
+        </div>
+    </div>
+
+    // 3. SẢN PHẨM BÁN CHẠY
+    if (list.Count > 1)
+    {
+        @await Html.PartialAsync("_ProductSection", list[1])
+    }
+}
+
+
+@if (Model?.Promotions != null && Model.Promotions.Any())
+{
+    @await Html.PartialAsync("_StaticContent", Model.Promotions)
+}

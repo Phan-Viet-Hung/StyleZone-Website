@@ -1,0 +1,138 @@
+﻿@using API.DomainCusTomer.DTOs.Tintuc
+@model List<TinTucDto>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tin Tức</li>
+    </ol>
+</nav>
+<div class="container my-4">
+
+
+    <h1 class="mb-4">Tin Tức & Sự kiện</h1>
+
+    <div class="news-container">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <a asp-action="Detail" asp-controller="TinTucCustomer" asp-route-id="@item.Id" class="text-decoration-none">
+                    <div class="card h-100">
+                        <img src="@($"https://localhost:7257/{(item.ImageUrl ?? "default1.jpg")}")" class="card-img-top" alt="@item.Title" />
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-dark">@item.Title</h5>
+                            <p class="card-text text-muted">@item.ShortDescription</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-muted">
+                            <small>@item.CreatedDate.ToString("dd/MM/yyyy")</small>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <p>Hiện chưa có tin tức nào.</p>
+        }
+    </div>
+</div>
+
+
+    <style>
+        .news-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 30px;
+        }
+
+        .news-container a {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .news-container .card {
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .news-container .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.15);
+        }
+
+        .news-container .card-img-top {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .news-container .card-body {
+            padding: 1.2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .news-container .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .news-container .card-text {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-container .card-footer {
+            padding: 0.8rem 1.2rem;
+            font-size: 0.85rem;
+            color: #888;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        @@media (max-width: 768px) {
+            .news-container .card-img-top {
+                height: 180px;
+            }
+
+            .news-container .card-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .news-container {
+                gap: 20px;
+            }
+
+            .news-container .card-img-top {
+                height: 160px;
+            }
+        }
+    </style>
+
+
+

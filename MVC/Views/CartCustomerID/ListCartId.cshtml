@@ -1,0 +1,274 @@
+﻿@using API.DomainCusTomer.DTOs.CastCustomerId
+@model List<CastCustomerIDDto>
+@{
+    ViewData["Title"] = "ListCartId";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+    Context.Session.SetString("CartIDCount", Model?.Count.ToString() ?? "0");
+    var username = Context.Request.Cookies["UserName"] ?? Context.Request.Cookies["LoginMethod"];
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+    </ol>
+</nav>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["CartValidationErrors"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["CartValidationErrors"]
+    </div>
+}
+<div class="container my-4" id="cart-container" role="main" aria-label="Shopping cart">
+    <div class="row border-bottom border-2 border-pink pb-2 text-center fw-normal small header-row" role="row">
+        <div class="col-6 col-md-6" role="columnheader">Sản phẩm</div>
+        <div class="col-2 col-md-2" role="columnheader">Đơn giá</div>
+        <div class="col-2 col-md-2" role="columnheader">Số lượng</div>
+        <div class="col-2 col-md-2" role="columnheader">Thành tiền</div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="row align-items-center border-bottom py-4 product-row"
+                 data-id="@item.productdetailcode"
+                 data-price="@item.Price" data-stock="@item.StockQuantity" role="row">
+
+                <div class="col-6 d-flex align-items-start position-relative" role="gridcell">
+                    <div style="display:inline;">
+                        <form asp-action="Delete" asp-controller="CartCustomerID" method="post" style="display:inline;">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit"
+                                    class="remove-btn d-none d-sm-inline"
+                                    aria-label="Remove @item.ProductName">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <img src="@($"https://localhost:7257/{(string.IsNullOrEmpty(item.ImageUrl) ? "images/default.jpg" : item.ImageUrl)}")"
+                         alt="@item.ProductName" width="80" height="80" class="me-3" loading="lazy" />
+                    <div>
+                        <div class="fw-normal fs-5 mb-1">@item.ProductName</div>
+                        <p class="product-desc text-black-900 mb-0">
+                            Mã SP: @item.productdetailcode<br />
+                            Nhóm: @item.ColorName /<br />
+                            Size: @item.SizeName<br />
+                        </p>
+                    </div>
+                    <form asp-action="Delete" asp-controller="CartCustomerID" method="post"
+                          class="d-inline d-sm-none position-absolute top-0 end-0">
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        <button type="submit" class="remove-btn" aria-label="Remove @item.ProductName"
+                                style="padding:4px 8px; font-size:22px; z-index:10;">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+
+              @*   <div class="col-2 text-center price"
+                     aria-label="Unit price @item.Price" role="gridcell">
+                    @item.Price<span>đ</span>
+                </div> *@
+                <div class="col-2 text-center price"
+                     aria-label="Unit price @((item.Price ?? 0).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))"
+                     role="gridcell">
+                    @((item.Price ?? 0).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))
+                </div>
+
+
+                <div class="col-2 d-flex justify-content-center align-items-center gap-2 quantity"
+                     aria-label="Quantity controls" role="gridcell">
+                    <!-- Nút giảm -->
+                    <div class="col-auto">
+                        <form asp-action="Decrease" asp-controller="CartCustomerID" method="post" style="display:inline;">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit" class="qty-btn" data-action="decrease" aria-label="Decrease quantity">-</button>
+                        </form>
+                    </div>
+
+                    <!-- Input số lượng -->
+                    <div class="col-auto">
+                        <input type="text"
+                               value="@item.Quantity"
+                               name="Quantity"
+                               readonly
+                               aria-live="polite"
+                               aria-atomic="true"
+                               aria-label="Quantity @item.Quantity"
+                               class="qty-input"
+                               data-quantity />
+                    </div>
+
+                    <!-- Nút tăng -->
+                    <div class="col-auto">
+                        <form asp-action="Increase" asp-controller="CartCustomerID" method="post" style="display:inline;">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit"
+                                    class="qty-btn"
+                                    data-action="increase"
+                                    aria-label="Increase quantity"
+                            @(item.Quantity >= item.StockQuantity ? "disabled" : "")>
+                                +
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-2 text-center total"
+                     aria-label="Total price @(((item.Price ?? 0) * (item.Quantity ?? 0)).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))"
+                     data-total role="gridcell">
+                    @(((item.Price ?? 0) * (item.Quantity ?? 0)).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-center my-4">Giỏ hàng của bạn đang trống.</p>
+    }
+
+    <div class="continue-shopping mt-3">
+        <a asp-action="TheThaoCustomer" asp-controller="TheThaoCustomer" class="text-decoration-none">&larr; Tiếp tục mua sắm</a>
+    </div>
+</div>
+
+<div class="container d-flex flex-wrap justify-content-end align-items-center gap-3 mt-4 px-3 px-md-0 bottom-section" role="contentinfo">
+    @if (Model.Count > 0)
+    {
+       @*  <div class="price-summary text-end small text-secondary" aria-live="polite" aria-atomic="true">
+            <div class="label mb-1">Thành tiền</div>
+            <div class="amount fw-semibold fs-4 text-danger" id="grand-total">
+                @Model?.Sum(x => x.Price * x.Quantity)<span>đ</span>
+            </div>
+            <div class="vat-note fst-italic fs-7">(Đã bao gồm VAT nếu có)</div>
+        </div> *@
+
+        <div class="price-summary text-end small text-secondary" aria-live="polite" aria-atomic="true">
+            <div class="label mb-1">Thành tiền</div>
+            <div class="amount fw-semibold fs-4 text-danger" id="grand-total">
+                @((Model?.Sum(x => (x.Price ?? 0) * x.Quantity) ?? 0).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))
+            </div>
+            <div class="vat-note fst-italic fs-7">(Đã bao gồm VAT nếu có)</div>
+        </div>
+
+        <form id="checkout-form" asp-action="CartBeforeCheckout" asp-controller="CartCustomerID" method="get">
+            <button id="checkout-btn" type="submit" class="btn btn-dark px-4 py-2">
+                Thanh toán
+            </button>
+        </form>
+
+    }
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        // Format number with comma as thousands separator
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Update total price for a product row
+        function updateProductTotal(row) {
+            const price = parseFloat(row.dataset.price) || 0;
+            const qty = parseInt(row.querySelector('[data-quantity]').value, 10) || 0;
+            const total = price * qty;
+
+            const totalEl = row.querySelector('[data-total]');
+            totalEl.innerHTML = formatNumber(total) + '<span>đ</span>';
+            totalEl.setAttribute('aria-label', `Total price ${formatNumber(total)}đ`);
+        }
+
+        // Update grand total price
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            document.querySelectorAll('.product-row').forEach(row => {
+                const price = parseFloat(row.dataset.price) || 0;
+                const qty = parseInt(row.querySelector('[data-quantity]').value, 10) || 0;
+                grandTotal += price * qty;
+            });
+            const grandTotalEl = document.getElementById('grand-total');
+            grandTotalEl.innerHTML = formatNumber(grandTotal) + '<span>đ</span>';
+        }
+
+        // Update minus button state
+        function updateMinusButtonState(row) {
+            const qty = parseInt(row.querySelector('[data-quantity]').value, 10);
+            const decreaseBtn = row.querySelector('button[data-action="decrease"]');
+            if (decreaseBtn) decreaseBtn.disabled = qty <= 1;
+        }
+
+        // Change quantity handler
+        function changeQuantity(row, delta) {
+            const qtyInput = row.querySelector('[data-quantity]');
+            const stock = parseInt(row.dataset.stock, 10);
+
+            let qty = parseInt(qtyInput.value, 10) + delta;
+            if (qty < 1) qty = 1;
+            if (qty > stock) qty = stock; // ✅ Giới hạn đúng tồn kho
+
+            qtyInput.value = qty;
+            qtyInput.setAttribute('aria-label', `Quantity ${qty}`);
+
+            // Update UI states
+            updateProductTotal(row);
+            updateGrandTotal();
+            updateMinusButtonState(row);
+            // updatePlusButtonState(row);
+        }
+
+        // Remove product from cart
+        function removeProduct(row) {
+            row.remove();
+            updateGrandTotal();
+        }
+
+        // Event delegation
+        document.getElementById('cart-container').addEventListener('click', function (e) {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const row = btn.closest('.product-row');
+            if (!row) return;
+
+            switch (action) {
+                case 'remove':
+                    removeProduct(row);
+                    break;
+                // case 'decrease':
+                //     changeQuantity(row, -1);
+                //     break;
+                case 'increase':
+                    changeQuantity(row, 1);
+                    break;
+            }
+        });
+
+        // Init all rows on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.product-row').forEach(row => {
+                updateProductTotal(row);
+                updateMinusButtonState(row);
+                updatePlusButtonState(row);
+            });
+            updateGrandTotal();
+        });
+    </script>
+}

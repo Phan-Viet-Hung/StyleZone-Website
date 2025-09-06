@@ -1,0 +1,153 @@
+﻿@model List<API.Domain.DTOs.ProductDto>
+
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+    string defaultImage = "/images/no-image.png";
+}
+
+@section Styles {
+    <style>
+        .copy-id {
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+
+        .table td, .table th {
+            vertical-align: middle;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .table-wrapper {
+            overflow-x: unset !important;
+        }
+    </style>
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <!-- Tiêu đề -->
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh sách sản phẩm</h2>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+
+        <!-- Nút tạo + xuất file -->
+        <div class="card-style mb-30">
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-6">
+                    <a asp-action="Create" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+                    </a>
+
+                    <form asp-action="Import" asp-controller="Products" method="post" enctype="multipart/form-data" class="d-inline-block" onsubmit="return validateExcel();">
+                        <label for="excelFile" class="btn btn-outline-secondary btn-sm me-2">
+                            <i class="bi bi-file-earmark-excel"></i> Nhập Excel
+                        </label>
+                        <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" class="d-none" onchange="this.form.submit()" />
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a asp-action="Export" class="text-primary fw-medium">
+                        <i class="bi bi-upload"></i> Xuất file
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper table-responsive">
+                <table id="productTable" class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giới tính</th>
+                            <th>Tồn kho</th>
+                            <th>Người tạo</th>
+                            <th>Danh mục</th>
+                            <th>Thương hiệu</th>
+                            <th>Ngày tạo</th>
+                            <th>Mô tả</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model)
+                        {
+                            <tr>
+                                <td title="@product.Id">
+                                    <span class="copy-id" data-id="@product.Id">
+                                        @product.Id.ToString().Substring(0, 8)
+                                    </span>
+                                </td>
+                                <td>@product.Name</td>
+                                
+                                <td>@product.GenderName</td>
+                                <td>@product.TotalQuantity</td>
+                                <td title="@product.CreatedBy">
+                                    <span class="copy-id" data-id="@product.CreatedBy">
+                                        @product.CreatedBy.ToString().Substring(0, 8)
+                                    </span>
+                                </td>
+                                <td>@product.CategoryName</td>
+                                <td>@product.BrandName</td>
+                                <td>@product.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@product.Description</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@product.Id"
+                                       class="lni lni-zoom-in text-info" title="Xem thêm"></a>
+                                    <a asp-action="Edit" asp-route-id="@product.Id"
+                                       class="lni lni-pencil text-primary" title="Chỉnh sửa"></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (!$.fn.DataTable.isDataTable('#productTable')) {
+                    $('#productTable').DataTable({
+                    language: {
+                        search: "Tìm kiếm:",
+                        lengthMenu: "Hiển thị _MENU_ dòng",
+                        info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                        paginate: {
+                            first: "Đầu",
+                            last: "Cuối",
+                            next: "→",
+                            previous: "←"
+                        },
+                        zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                        infoEmpty: "Không có dữ liệu",
+                        infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+                    },
+                    columnDefs: [
+                        { targets: -1, orderable: false } // cột hành động không sắp xếp
+                    ],
+                    order: [[7, "desc"]] // <- cột Ngày tạo giảm dần
+                });
+
+            }
+
+            // Copy ID to clipboard
+            $(document).on('click', '.copy-id', function () {
+                const fullId = $(this).data('id');
+                navigator.clipboard.writeText(fullId)
+                    .then(() => alert('Đã sao chép ID: ' + fullId))
+                    .catch(err => console.error('Không thể sao chép: ', err));
+            });
+        });
+    </script>
+}

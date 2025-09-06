@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewData["Title"] = "VanChuyen";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active current" aria-current="page">Vận Chuyển</li>
+    </ol>
+</nav>
+
+<main class="container my-4" style="max-width: 900px;">
+    <div class="bg-white p-4 p-md-5 shadow-sm rounded">
+        <h2 class="fw-bold text-uppercase border-bottom pb-2 mb-4">Vận chuyển</h2>
+
+        <h5 class="fw-bold">1. Cước phí vận chuyển</h5>
+        <ul>
+            <li>
+                Tất cả các đơn hàng Style Zone áp dụng biểu phí giao hàng theo từng khu vực được quy định bởi bên thứ 3
+                (bên thứ 3 là đơn vị vận chuyển được Style Zone liên kết hoặc các dịch vụ chuyển phát).
+            </li>
+            <li>
+                Đối với khách hàng không xác nhận đặt hàng nhưng khi nhân viên giao hàng gọi tới xác nhận lại từ chối nhận hàng,
+                vui lòng thanh toán phí chuyển hoàn cho nhân viên giao hàng.
+                <strong>Phí cố định: 40.000 VNĐ</strong>
+            </li>
+        </ul>
+
+        <h5 class="fw-bold mt-4">2. Thời gian vận chuyển</h5>
+        <ul>
+            <li>Tuyến nội thành Hà Nội: Giao hàng trong vòng 3–5 ngày kể từ khi hệ thống xác nhận đơn hàng.</li>
+            <li>Tuyến ngoại thành Hà Nội: Giao hàng trong vòng 3–7 ngày kể từ khi hệ thống xác nhận đơn hàng.</li>
+            <li>Tuyến Đà Nẵng, TP.HCM: Giao hàng trong vòng 3–7 ngày kể từ khi hệ thống xác nhận đơn hàng.</li>
+            <li>Tất cả thành phố khác: Giao hàng trong vòng 5–7 ngày kể từ khi hệ thống xác nhận đơn hàng.</li>
+            <li class="text-muted fst-italic">Thời gian giao hàng không tính Thứ Bảy, Chủ Nhật và các ngày lễ, Tết.</li>
+        </ul>
+
+        <h5 class="fw-bold mt-4">3. Đơn hàng được giao tối đa mấy lần?</h5>
+        <p>
+            Đơn hàng sẽ được giao tối đa <strong>2 lần</strong>. Nếu lần 1 giao không thành công,
+            nhân viên vận chuyển sẽ liên hệ lại để giao lần 2 sau 1–2 ngày làm việc tiếp theo.
+            Nếu vẫn không thành công sau 2 lần, đơn hàng sẽ bị <strong>hủy tự động</strong>.
+        </p>
+
+        <h5 class="fw-bold mt-4">4. Kiểm tra tình trạng đơn hàng</h5>
+        <p>
+            Để kiểm tra tình trạng đơn hàng, vui lòng sử dụng <strong>MÃ ĐƠN HÀNG</strong> được gửi trong email hoặc tin nhắn xác nhận
+            và liên hệ với bộ phận chăm sóc khách hàng qua:
+            <br />
+            📞 <a href="tel:1900633083" class="fw-semibold text-decoration-none text-primary">1900633083</a> hoặc ✉️
+            <span class="text-muted">liningvn@gmail.com</span>
+        </p>
+
+        <h5 class="fw-bold mt-4">5. Khi nhận hàng có được kiểm tra trước khi thanh toán không?</h5>
+        <ul>
+            <li>Bạn hoàn toàn có thể mở gói hàng kiểm tra sản phẩm trước khi thanh toán hoặc trước khi nhân viên giao rời đi.</li>
+            <li>
+                Nếu có vấn đề về sản phẩm, vui lòng liên hệ ngay hotline:
+                <a href="tel:1900633083" class="fw-semibold text-decoration-none text-primary">1900633083</a>
+                để được hỗ trợ kịp thời.
+            </li>
+        </ul>
+    </div>
+</main>

@@ -1,0 +1,114 @@
+body {
+  background-color: #f8f9fa;
+}
+
+/* Promo Code */
+.promo-code {
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.promo-code:hover {
+  text-decoration: underline;
+}
+
+/* Promo Icon */
+.promo-icon {
+  font-size: 1.5rem;
+  color: #0d6efd;
+  margin-bottom: 8px;
+}
+
+/* Promo Card */
+.promo-card {
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  background-color: #fff;
+ 
+  transition: box-shadow 0.2s ease;
+  height: 100%; /* Đảm bảo card đều chiều cao */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.promo-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Bóng xám đen */
+}
+
+.promo-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.promo-example {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Bulk Action Bar */
+.bulk-action-bar {
+  background-color: #e9f3ff;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 500;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.bulk-action-bar a {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bulk-action-bar a:hover {
+  text-decoration: underline;
+}
+
+/* DataTable Button */
+.dt-buttons {
+  display: none;
+}
+
+/* Copy Icon & Hover Tooltip */
+.copy-icon-box {
+  display: none;
+  position: relative;
+  cursor: pointer;
+}
+
+.copy-icon-box i {
+  font-size: 1.2rem;
+  color: #000;
+}
+
+.copy-text {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 120%;
+  transform: translateY(-50%);
+  background-color: #000;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 15px;
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+/* Hover behaviors */
+.promo-code-wrapper:hover .copy-icon-box {
+  display: inline-block;
+}
+
+.copy-icon-box:hover .copy-text {
+  display: inline-block;
+}
+

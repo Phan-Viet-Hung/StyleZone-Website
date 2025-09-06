@@ -1,0 +1,299 @@
+﻿@using DAL_Empty.Models
+@model List<Address>
+
+@{
+    ViewData["Title"] = "DiaChi";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<link href="~/css/CSS/Taikhoancuatoi.css" rel="stylesheet" />
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Địa Chỉ</li>
+    </ol>
+</nav>
+
+<main>
+    <!-- Modal Thêm địa chỉ mới -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Thông tin giao hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <form id="formAddAddress" asp-action="ThemDiaChi" asp-controller="DonMuaCustomer" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" name="FullName" class="form-control form-control-sm" placeholder="Họ và tên" required />
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" name="PhoneNumber" class="form-control form-control-sm" placeholder="Số điện thoại" pattern="^0\d{9}$" required />
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="ProvinceSelect" required></select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="DistrictSelect" required disabled></select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="WardSelect" required disabled></select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="Province" id="Province" />
+                        <input type="hidden" name="District" id="District" />
+                        <input type="hidden" name="Ward" id="Ward" />
+                        <div class="mb-3">
+                            <input type="text" name="DetailAddress" class="form-control form-control-sm" placeholder="Địa chỉ (số nhà, tên đường)" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cập nhật địa chỉ -->
+    <div class="modal fade" id="updateAddressModal" tabindex="-1" aria-labelledby="updateAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateAddressModalLabel">Cập nhật địa chỉ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <form id="formUpdateAddress" asp-action="UpdateDiaChi" asp-controller="DonMuaCustomer" method="post">
+                    <input type="hidden" name="Id" id="updateId" />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" name="FullName" class="form-control form-control-sm" id="updateFullName" required />
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" name="PhoneNumber" class="form-control form-control-sm" id="updatePhoneNumber" pattern="^0\d{9}$" required />
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="updateProvinceSelect" required></select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="updateDistrictSelect" required disabled></select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" id="updateWardSelect" required disabled></select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="Province" id="updateProvince" />
+                        <input type="hidden" name="District" id="updateDistrict" />
+                        <input type="hidden" name="Ward" id="updateWard" />
+                        <div class="mb-3">
+                            <input type="text" name="DetailAddress" class="form-control form-control-sm" id="updateAddress" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách địa chỉ -->
+  
+        <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-4">
+            <h2 class="mb-0">Địa chỉ của tôi</h2>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                <i class="fas fa-plus"></i> Thêm địa chỉ mới
+            </button>
+        </div>
+
+        @foreach (var a in Model)
+        {
+            <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div><strong>@a.FullName</strong> <span class="text-secondary ms-2">+84 @a.PhoneNumber</span></div>
+                    <span>
+                        <a type="button"
+                           class="text-primary"
+                           data-bs-toggle="modal"
+                           data-bs-target="#updateAddressModal"
+                           data-id="@a.Id"
+                           data-fullname="@a.FullName"
+                           data-phonenumber="@a.PhoneNumber"
+                           data-detailaddress="@a.DetailAddress"
+                           data-province="@a.Province"
+                           data-district="@a.District"
+                           data-ward="@a.Ward">Cập nhật</a> |
+                        <a asp-action="RemoveDiaChi" asp-route-id="@a.Id" class="text-primary">Xóa</a>
+                    </span>
+                </div>
+                <p class="text-secondary">@a.DetailAddress</p>
+                <p class="text-secondary">@a.Ward, @a.District, @a.Province</p>
+                
+                @if (a.Status == "Mặc định")
+                {
+                    <span class="badge-default">@a.Status</span>
+                }
+                else
+                {
+                    <form asp-action="UpdateStatusDiaChi" asp-controller="DonMuaCustomer" asp-route-id="@a.Id">
+                    <span class="badge-default">
+                            <button type="submit">Thiết lập mặc định</button>
+                    </span>
+                    </form>
+                
+                }
+               
+            </div>
+        }
+</main>
+
+@section Scripts {
+    <script>
+        const apiLocalGHN = "https://localhost:7257/api/GHN/";
+
+        async function ghnGet(endpoint) {
+            const res = await fetch(apiLocalGHN + endpoint);
+            return res.ok ? res.json() : [];
+        }
+
+        async function ghnPost(endpoint, body) {
+            const res = await fetch(apiLocalGHN + endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            return res.ok ? res.json() : [];
+        }
+
+        async function setupLocationDropdowns(prefix) {
+            const provinceEl = document.getElementById(`${prefix}ProvinceSelect`);
+            const districtEl = document.getElementById(`${prefix}DistrictSelect`);
+            const wardEl = document.getElementById(`${prefix}WardSelect`);
+            const provinceHidden = document.getElementById(`${prefix}Province`);
+            const districtHidden = document.getElementById(`${prefix}District`);
+            const wardHidden = document.getElementById(`${prefix}Ward`);
+
+            // Lấy tỉnh/thành
+            const provinces = await ghnGet("provinces"); // trả về mảng [{ProvinceID, ProvinceName}]
+            provinceEl.innerHTML = '<option value="">Tỉnh / thành</option>';
+            provinces.forEach(p => {
+                provinceEl.innerHTML += `<option value="${p.ProvinceID}">${p.ProvinceName}</option>`;
+            });
+
+            // Khi chọn tỉnh -> load huyện
+            provinceEl.addEventListener("change", async () => {
+                const provinceID = provinceEl.value;
+                districtEl.innerHTML = '<option value="">Quận / huyện</option>';
+                wardEl.innerHTML = '<option value="">Phường / xã</option>';
+                wardEl.disabled = true;
+
+                if (!provinceID) {
+                    districtEl.disabled = true;
+                    return;
+                }
+
+                const districts = await ghnPost("districts", { province_id: parseInt(provinceID) });
+                districts.forEach(d => {
+                    districtEl.innerHTML += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+                });
+
+                districtEl.disabled = false;
+                provinceHidden.value = provinceEl.options[provinceEl.selectedIndex].text;
+            });
+
+            // Khi chọn huyện -> load xã
+            districtEl.addEventListener("change", async () => {
+                const districtID = districtEl.value;
+                wardEl.innerHTML = '<option value="">Phường / xã</option>';
+
+                if (!districtID) {
+                    wardEl.disabled = true;
+                    return;
+                }
+
+                const wards = await ghnPost("wards", { district_id: parseInt(districtID) });
+                wards.forEach(w => {
+                    wardEl.innerHTML += `<option value="${w.WardCode}">${w.WardName}</option>`;
+                });
+
+                wardEl.disabled = false;
+                districtHidden.value = districtEl.options[districtEl.selectedIndex].text;
+            });
+
+            // Chọn xã
+            wardEl.addEventListener("change", () => {
+                wardHidden.value = wardEl.options[wardEl.selectedIndex].text;
+            });
+        }
+
+        // Modal thêm địa chỉ mới
+        document.getElementById('addAddressModal').addEventListener('show.bs.modal', async () => {
+            await setupLocationDropdowns("");
+        });
+
+        // Modal cập nhật địa chỉ
+        document.getElementById('updateAddressModal').addEventListener('show.bs.modal', async function (event) {
+            const btn = event.relatedTarget;
+            const id = btn.getAttribute("data-id");
+            const fullname = btn.getAttribute("data-fullname");
+            const phone = btn.getAttribute("data-phonenumber");
+            const address = btn.getAttribute("data-detailaddress");
+            const provinceName = btn.getAttribute("data-province");
+            const districtName = btn.getAttribute("data-district");
+            const wardName = btn.getAttribute("data-ward");
+
+            document.getElementById("updateId").value = id;
+            document.getElementById("updateFullName").value = fullname;
+            document.getElementById("updatePhoneNumber").value = phone;
+            document.getElementById("updateAddress").value = address;
+
+            await setupLocationDropdowns("update");
+
+            const provinceEl = document.getElementById("updateProvinceSelect");
+            const districtEl = document.getElementById("updateDistrictSelect");
+            const wardEl = document.getElementById("updateWardSelect");
+
+            // Set tỉnh
+            const provinceOption = [...provinceEl.options].find(opt => opt.text === provinceName);
+            if (provinceOption) {
+                provinceEl.value = provinceOption.value;
+                document.getElementById("updateProvince").value = provinceOption.text;
+
+                // Load huyện theo tỉnh
+                const districts = await ghnPost("districts", { province_id: parseInt(provinceOption.value) });
+                districtEl.innerHTML = '<option value="">Quận / huyện</option>';
+                districts.forEach(d => {
+                    districtEl.innerHTML += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+                });
+                districtEl.disabled = false;
+
+                // Set huyện
+                const districtOption = [...districtEl.options].find(opt => opt.text === districtName);
+                if (districtOption) {
+                    districtEl.value = districtOption.value;
+                    document.getElementById("updateDistrict").value = districtOption.text;
+
+                    // Load xã theo huyện
+                    const wards = await ghnPost("wards", { district_id: parseInt(districtOption.value) });
+                    wardEl.innerHTML = '<option value="">Phường / xã</option>';
+                    wards.forEach(w => {
+                        wardEl.innerHTML += `<option value="${w.WardCode}">${w.WardName}</option>`;
+                    });
+                    wardEl.disabled = false;
+
+                    // Set xã
+                    const wardOption = [...wardEl.options].find(opt => opt.text === wardName);
+                    if (wardOption) {
+                        wardEl.value = wardOption.value;
+                        document.getElementById("updateWard").value = wardOption.text;
+                    }
+                }
+            }
+        });
+    </script>
+}

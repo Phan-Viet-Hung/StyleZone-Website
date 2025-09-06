@@ -1,0 +1,172 @@
+﻿@* <aside class="sidebar-nav-wrapper">
+    <div class="navbar-logo">
+        <a href="/">
+            <img src="~/assets/images/logo/stylezone-logo.svg" alt="logo" />
+        </a>
+    </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a href="/admin">
+                    <span class="icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.75 18.3333C12.2376 18.3333 15.1364 15.8128 15.7244 12.4941C15.8448 11.8143 15.2737 11.25 14.5833 11.25H10C9.30966 11.25 8.75 10.6903 8.75 10V5.41666C8.75 4.7263 8.18563 4.15512 7.50586 4.27556C4.18711 4.86357 1.66666 7.76243 1.66666 11.25C1.66666 15.162 4.83797 18.3333 8.75 18.3333Z" />
+                            <path d="M17.0833 10C17.7737 10 18.3432 9.43708 18.2408 8.75433C17.7005 5.14918 14.8508 2.29947 11.2457 1.75912C10.5629 1.6568 10 2.2263 10 2.91665V9.16666C10 9.62691 10.3731 10 10.8333 10H17.0833Z" />
+                        </svg>
+                    </span>
+                    <span class="text">Thống kê</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/banhang">
+                    <span class="icon">
+                        <i class="lni lni-cart"></i>
+                    </span>
+                    <span class="text">Bán hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/hoadon">
+                    <span class="icon">
+                        <i class="lni lni-ticket-alt"></i>
+                    </span>
+                    <span class="text">Hóa đơn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/supplier">
+                    <span class="icon">
+                        <i class="lni lni-briefcase"></i>
+                    </span>
+                    <span class="text">Nhà cung cấp</span>
+                </a>
+            </li>
+            <span class="divider"><hr /></span>
+            <li class="nav-item">
+                <a href="/admin/thongbao">
+                    <span class="icon">
+                        <i class="lni lni-popup"></i>
+                    </span>
+                    <span class="text">Thông báo</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+<div class="overlay"></div>
+ *@
+@using API.Domain.DTOs
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var userJson = HttpContextAccessor.HttpContext.Session.GetString("UserData");
+    AccountDto account = null;
+    if (!string.IsNullOrEmpty(userJson))
+    {
+        account = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountDto>(userJson);
+    }
+}
+<aside class="sidebar-nav-wrapper">
+    <div class="navbar-logo">
+        <a href="/admin/dashboard">
+            <img src="~/assets/images/logo/stylezone-logo.svg" alt="logo" />
+        </a>
+    </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a href="/admin">
+                    <span class="icon">
+                        <!-- icon thống kê -->
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.75 18.3333C12.2376 18.3333 15.1364 15.8128 15.7244 12.4941C15.8448 11.8143 15.2737 11.25 14.5833 11.25H10C9.30966 11.25 8.75 10.6903 8.75 10V5.41666C8.75 4.7263 8.18563 4.15512 7.50586 4.27556C4.18711 4.86357 1.66666 7.76243 1.66666 11.25C1.66666 15.162 4.83797 18.3333 8.75 18.3333Z" />
+                            <path d="M17.0833 10C17.7737 10 18.3432 9.43708 18.2408 8.75433C17.7005 5.14918 14.8508 2.29947 11.2457 1.75912C10.5629 1.6568 10 2.2263 10 2.91665V9.16666C10 9.62691 10.3731 10 10.8333 10H17.0833Z" />
+                        </svg>
+                    </span>
+                    <span class="text">Thống kê</span>
+                </a>
+            </li>
+
+            @if (account != null && account.roleName == "Admin")
+            {
+                <li class="nav-item">
+                    <a href="/admin/account">
+                        <span class="icon">
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round"
+                                      stroke-linejoin="round" stroke-width="2"
+                                      d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-3 5h3m-6 0h.01M12 16h3m-6 0h.01M10 3v4h4V3h-4Z" />
+                            </svg>
+                        </span>
+                        <span class="text">Tài khoản</span>
+                    </a>
+                </li>
+            }
+
+
+
+            <li class="nav-item">
+                <a href="/admin/order/create">
+                    <span class="icon"><i class="lni lni-cart"></i></span>
+                    <span class="text">Bán hàng</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/order">
+                    <span class="icon"><i class="lni lni-ticket-alt"></i></span>
+                    <span class="text">Hóa đơn</span>
+                </a>
+            </li>
+
+            <!-- Dịch vụ có submenu -->
+            @if (account != null && account.roleName == "Admin")
+            {
+                <li class="nav-item nav-item-has-children">
+                    <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_service" aria-controls="ddmenu_service" aria-expanded="false">
+                        <span class="icon"><i class="lni lni-cog"></i></span>
+                        <span class="text">Dịch vụ</span>
+                    </a>
+                    <ul id="ddmenu_service" class="collapse dropdown-nav">
+                        <li><a href="/admin/promotions">Khuyến mãi</a></li>
+                        <li><a href="/admin/vouchers">Voucher</a></li>
+                    </ul>
+                </li>
+            }
+            <!-- Sản phẩm có submenu -->
+            <li class="nav-item nav-item-has-children">
+                <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_product" aria-controls="ddmenu_product" aria-expanded="false">
+                    <span class="icon"><i class="lni lni-grid-alt"></i></span>
+                    <span class="text">Sản phẩm</span>
+                </a>
+                <ul id="ddmenu_product" class="collapse dropdown-nav">
+                    <li><a href="/admin/products">Danh sách sản phẩm</a></li>
+                    <li><a href="/admin/categories">Danh mục sản phẩm</a></li>
+                    <li><a href="/admin/brands">Danh sách thương hiệu</a></li>
+                    <li><a href="/admin/materials">Danh sách chất liệu</a></li>
+                    <li><a href="/admin/origins">Danh sách xuất xứ</a></li>
+                    <li><a href="/admin/colors">Danh sách màu</a></li>
+                    <li><a href="/admin/suppliers">Nhà cung cấp</a></li>
+                </ul>
+            </li>
+
+
+            <li class="nav-item">
+                <a href="/admin/customer">
+                    <span class="icon"><i class="lni lni-briefcase"></i></span>
+                    <span class="text">Khách hàng</span>
+                </a>
+            </li>
+
+
+        </ul>
+    </nav>
+    @*  <div class="promo-box">
+    <div class="promo-icon">
+    <img class="mx-auto" src="~/assets/images/logo/stylezone-icon.svg" alt="Logo">
+    </div>
+    </div> *@
+</aside>
+<div class="overlay"></div>

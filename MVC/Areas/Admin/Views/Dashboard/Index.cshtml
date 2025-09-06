@@ -1,0 +1,472 @@
+﻿
+@model API.Domain.DTOs.ThongKe.DashboardStatisticDto
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Thống kê Dashboard";
+}
+@section Styles {
+    <style>
+        /* =========================
+               Bảng thống kê trạng thái đơn hàng
+            ========================== */
+        #orderStatusTable {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+            #orderStatusTable thead {
+                background: #fff;
+                color: #000;
+                font-weight: bold;
+                border-bottom: 2px solid #ddd;
+            }
+
+            #orderStatusTable tbody tr:hover {
+                background-color: rgba(0, 0, 0, 0.03);
+                transition: background-color 0.2s ease-in-out;
+            }
+
+            #orderStatusTable td,
+            #orderStatusTable th {
+                vertical-align: middle;
+                padding: 12px;
+            }
+
+        /* =========================
+               Bảng Top sản phẩm & thương hiệu
+            ========================== */
+        #topProductsTable,
+        #topBrandsTable {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+            #topProductsTable thead,
+            #topBrandsTable thead {
+                background: #fff;
+                color: #000;
+                font-weight: bold;
+                border-bottom: 2px solid #ddd;
+            }
+
+            #topProductsTable tbody tr:hover,
+            #topBrandsTable tbody tr:hover {
+                background-color: rgba(0, 0, 0, 0.03);
+                transition: background-color 0.2s ease-in-out;
+            }
+
+            #topProductsTable td,
+            #topBrandsTable td {
+                vertical-align: middle;
+                padding: 12px;
+            }
+
+        /* Badge chung */
+        .badge {
+            font-size: 0.9rem;
+            padding: 6px 10px;
+            border-radius: 12px;
+        }
+    </style>
+
+}
+
+<section class="table-components">
+    <div class="container-fluid" style="padding-top: 20px">
+        <!-- Khối thống kê -->
+        <div class="card-style mb-4 p-3">
+            <div class="row text-center mb-4">
+                <div class="col-md-3">
+                    <h5>Sản phẩm</h5>
+                    <h3>@ViewBag.CountProduct</h3>
+                </div>
+                <div class="col-md-3">
+                    <h5>Đơn hàng</h5>
+                    <h3>@ViewBag.CountOrder</h3>
+                </div>
+                <div class="col-md-3">
+                    <h5>Danh mục</h5>
+                    <h3>@ViewBag.CountCategory</h3>
+                </div>
+                <div class="col-md-3">
+                    <h5>Người dùng</h5>
+                    <h3>@ViewBag.CountUser</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="card-style mb-4 p-3">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>Lọc nhanh</label>
+                    <select id="quickFilter" class="form-control">
+                        <option value="">-- Chọn khoảng thời gian --</option>
+                        <option value="7days">7 ngày trước</option>
+                        <option value="thisMonth" selected>Tháng này</option>
+                        <option value="last3Months">3 tháng trước</option>
+                        <option value="1year">1 năm</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Từ ngày</label>
+                    <input type="date" id="startDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Đến ngày</label>
+                    <input type="date" id="endDate" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button id="btnFilterCustom" class="btn btn-primary w-100">Lọc theo ngày</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thống kê trạng thái đơn hàng -->
+        <div class="card-style p-3 mb-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="text-center mb-3">Thống kê trạng thái đơn hàng</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="orderStatusTable">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th scope="col" class="text-center">STT</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col" class="text-center">Tổng số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderStatusTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <!-- Top thương hiệu và sản phẩm dạng bảng -->
+        <div class="card-style p-3 mb-4">
+            <div class="row">
+                
+                <!-- Top 10 Sản phẩm -->
+                <div class="col-md-6">
+                    <h5 class="text-center mb-3">Top 10 Sản phẩm bán chạy</h5>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-striped" id="topProductsTable">
+                            <thead class="table-warning sticky-top">
+                                <tr>
+                                    <th style="padding-left:12px">Thứ hạng</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-center">Số lượng bán</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topProductsTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Top 3 Thương hiệu -->
+                <div class="col-md-6">
+                    <h5 class="text-center mb-3">Top 3 Thương hiệu bán chạy</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="topBrandsTable">
+                            <thead class="table-info">
+                                <tr>
+                                    <th style="padding-left:12px">Thứ hạng</th>
+                                    <th>Tên thương hiệu</th>
+                                    <th class="text-center">Số lượng bán</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topBrandsTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Biểu đồ cột -->
+        <div class="card-style p-3 mb-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="text-center mb-3">Biểu đồ doanh thu và số lượng bán</h5>
+                    <div style="overflow-x: auto;">
+                    <canvas id="barChart" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let currentFilterType = "thisMonth";
+        let currentStartDate = null;
+        let currentEndDate = null;
+
+        var ctx = document.getElementById('barChart').getContext('2d');
+        var barChart;
+
+        function loadChart(data) {
+            var labels = data.map(x => x.timeFrame);
+            var quantities = data.map(x => x.totalQuantitySold);
+            var revenues = data.map(x => x.totalRevenue);
+
+            var chartCanvas = document.getElementById('barChart');
+            chartCanvas.style.minWidth = (labels.length * 60) + 'px'; // 60px mỗi cột
+
+            if (barChart) barChart.destroy();
+
+            const ctxGradientBlue = ctx.createLinearGradient(0, 0, 0, 400);
+            ctxGradientBlue.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+            ctxGradientBlue.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
+
+            const ctxGradientPink = ctx.createLinearGradient(0, 0, 0, 400);
+            ctxGradientPink.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+            ctxGradientPink.addColorStop(1, 'rgba(255, 99, 132, 0.2)');
+
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Số lượng bán',
+                            data: quantities,
+                            backgroundColor: ctxGradientBlue,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Doanh thu',
+                            data: revenues,
+                            backgroundColor: ctxGradientPink,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let value = context.raw || 0;
+                                    if (context.dataset.label.includes('Số lượng')) {
+                                        return context.dataset.label + ': ' + value;
+                                    }
+                                    return context.dataset.label + ': ' + value.toLocaleString('vi-VN') + ' đ';
+                                }
+                            }
+                        },
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: 'Số lượng' }, beginAtZero: true },
+                        y1: { position: 'right', title: { display: true, text: 'Doanh thu (VNĐ)' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                        x: { title: { display: true, text: 'Ngày' } }
+                    }
+                }
+            });
+        }
+
+        function fetchData(filterType, startDate, endDate) {
+            $.ajax({
+                url: '@Url.Action("GetChartData", "Dashboard", new { area = "Admin" })',
+                type: 'POST',
+                data: { filterType: filterType, startDate: startDate, endDate: endDate },
+                success: function (res) {
+                    loadChart(res || []);
+                    currentFilterType = filterType;
+                    currentStartDate = startDate;
+                    currentEndDate = endDate;
+                    loadTopBrands();
+                    loadTopProducts();
+                    loadOrderStatusTable(filterType, startDate, endDate);
+                },
+                error: function () {
+                    alert("Không thể tải dữ liệu biểu đồ");
+                }
+            });
+        }
+
+        // Load top brands as table
+        function loadTopBrands() {
+            const tableBody = document.getElementById('topBrandsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center">Đang tải...</td></tr>';
+
+            $.ajax({
+                url: '@Url.Action("GetTopBrands", "Dashboard", new { area = "Admin" })',
+                type: 'POST',
+                data: { filterType: currentFilterType, startDate: currentStartDate, endDate: currentEndDate, top: 3 },
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Không có dữ liệu</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach((item, index) => {
+                        html += `
+                            <tr>
+                                <td class="text-center fw-bold">${index + 1}</td>
+                                <td class="fw-semibold">${item.brandName || "Không rõ"}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-info">${(item.totalSold || 0).toLocaleString()}</span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableBody.innerHTML = html;
+                },
+                error: function () {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>';
+                }
+            });
+        }
+
+        // Load top products as table
+        function loadTopProducts() {
+            const tableBody = document.getElementById('topProductsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center">Đang tải...</td></tr>';
+
+            $.ajax({
+                url: '@Url.Action("GetTopProducts", "Dashboard", new { area = "Admin" })',
+                type: 'POST',
+                data: { filterType: currentFilterType, startDate: currentStartDate, endDate: currentEndDate, top: 10 },
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Không có dữ liệu</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach((item, index) => {
+                        const productName = item.productName || item.name || item.tenSanPham || "Không rõ";
+                        html += `
+                            <tr>
+                                <td class="text-center fw-bold">${index + 1}</td>
+                                <td class="fw-semibold" title="${productName}">
+                                    ${productName.length > 30 ? productName.substring(0, 30) + "..." : productName}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark">${(item.totalSold || 0).toLocaleString()}</span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableBody.innerHTML = html;
+                },
+                error: function () {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>';
+                }
+            });
+        }
+
+        // Load order status table
+        function loadOrderStatusTable(filterType, startDate, endDate) {
+            const tableBody = document.getElementById('orderStatusTableBody');
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center">Đang tải dữ liệu...</td></tr>';
+
+            $.ajax({
+                url: '@Url.Action("GetOrderStatusStatistics", "Dashboard", new { area = "Admin" })',
+                type: 'POST',
+                data: { filterType: filterType, startDate: startDate, endDate: endDate },
+                success: function (data) {
+                    if (data.error) {
+                        tableBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Lỗi: ${data.error}</td></tr>`;
+                        return;
+                    }
+
+                    if (!data || data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="3" class="text-center">Không có dữ liệu</td></tr>';
+                        return;
+                    }
+
+                    let tableHTML = '';
+                    data.forEach((item, index) => {
+                        tableHTML += `
+                            <tr>
+                                <td class="text-center fw-bold">${index + 1}</td>
+                                <td class="fw-semibold">${item.statusName}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary rounded-pill">${item.totalOrders.toLocaleString()}</span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableBody.innerHTML = tableHTML;
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading order status:', error);
+                    tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi kết nối API</td></tr>';
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Load initial data
+            fetchData("thisMonth", null, null);
+
+            // Quick filter change
+            $("#quickFilter").change(function () {
+                var val = $(this).val();
+                if (val) {
+                    $("#startDate").val("");
+                    $("#endDate").val("");
+                    fetchData(val, null, null);
+                }
+            });
+
+            // Custom date filter
+            $("#btnFilterCustom").click(function () {
+                var start = $("#startDate").val();
+                var end = $("#endDate").val();
+                var today = new Date().setHours(0,0,0,0);
+
+                if (!start || !end) {
+                    alert("Vui lòng chọn đủ ngày bắt đầu và kết thúc");
+                    return;
+                }
+
+                var startDate = new Date(start).setHours(0,0,0,0);
+                var endDate = new Date(end).setHours(0,0,0,0);
+
+                if (startDate >= endDate) {
+                    alert("Ngày bắt đầu phải nhỏ hơn ngày kết thúc");
+                    return;
+                }
+
+                if (startDate > today || endDate > today) {
+                    alert("Không thể chọn ngày trong tương lai");
+                    return;
+                }
+
+                $("#quickFilter").val("");
+                fetchData("custom", start, end);
+            });
+        });
+    </script>
+}

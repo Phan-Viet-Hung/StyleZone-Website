@@ -1,0 +1,344 @@
+﻿@model API.Domain.Request.OrderRequest.CreateOrderRequest
+
+@{
+    ViewData["Title"] = "Tạo đơn hàng";
+    var products = ViewBag.Products as IEnumerable<API.Domain.DTOs.ProductDetailDto> ?? new List<API.Domain.DTOs.ProductDetailDto>();
+    var modeOfPayments = ViewBag.ModeOfPayments as List<SelectListItem> ?? new();
+    int tabId = ViewBag.TabId ?? 1;
+    List<int> openTabs = ViewBag.OpenTabs ?? new List<int>();
+}
+
+<!-- Tabs ngang -->
+<div class="tabs-container d-flex align-items-center mb-3">
+    <ul class="nav nav-tabs">
+        @foreach (var t in openTabs)
+        {
+            <li class="nav-item">
+                <a class="nav-link @(t == tabId ? "active" : "")" asp-action="Create" asp-route-tabId="@t" onclick="saveDraftBeforeSwitch()">
+                    Hóa đơn @t
+                </a>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link text-success" asp-action="NewTab" onclick="saveDraftBeforeSwitch()">+ Hóa đơn mới</a>
+        </li>
+    </ul>
+</div>
+
+<form method="post" asp-action="Checkout" id="orderForm">
+    <input type="hidden" name="tabId" value="@tabId" />
+    <input type="hidden" asp-for="TotalAmount" id="TotalAmount" />
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Khung sản phẩm -->
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Sản phẩm</strong></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>Quét QR code hoặc tìm kiếm sản phẩm</label>
+                            <input type="text" id="productInput" class="form-control" placeholder="Nhập hoặc quét..." autofocus />
+                        </div>
+
+                        <h6 class="fw-bold">Danh sách sản phẩm</h6>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm mb-4 table-hover align-middle text-center" id="searchResults">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="display:none;">QR Code</th>
+                                        <th style="width: 40%;">Tên</th>
+                                        <th style="width: 20%;">Giá</th>
+                                        <th style="width: 20%;">Tồn kho</th>
+                                        <th style="width: 20%;">Chọn</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <h6 class="fw-bold">Sản phẩm đã chọn</h6>
+                        <table class="table table-hover align-middle text-center" id="selectedTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50%;">Tên</th>
+                                    <th style="width: 20%;">Giá</th>
+                                    <th style="width: 20%;">Số lượng</th>
+                                    <th style="width: 10%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @* Reload draft *@
+                                @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                                {
+                                    int i = 0;
+                                    foreach (var item in Model.OrderDetails)
+                                    {
+                                        <tr data-id="@item.ProductDetailId">
+                                            <td>@products.FirstOrDefault(p => p.Id == item.ProductDetailId)?.Name</td>
+                                            <td>
+                                                <input type="hidden" name="OrderDetails[@i].Price" class="price-input" value="@item.Price" />
+                                                @item.Price.ToString("N0") ₫
+                                            </td>
+                                            <td>
+                                                <input type="number" name="OrderDetails[@i].Quantity" value="@item.Quantity" class="form-control quantity-input" min="1" />
+                                                <input type="hidden" name="OrderDetails[@i].ProductDetailId" value="@item.ProductDetailId" />
+                                            </td>
+                                            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">X</button></td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="mt-2 text-end">
+                            <strong>Tổng tiền: </strong>
+                            <span id="totalAmountDisplay">@Model.TotalAmount.ToString("N0")₫</span>
+                        </div>
+
+                        <!-- Chỗ hiển thị lỗi -->
+                        <div class="text-danger mt-2" id="errorMessage"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khách hàng -->
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Khách hàng</strong></div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label>Tên khách hàng</label>
+                            <input asp-for="CustomerName" class="form-control autosave" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Số điện thoại</label>
+                            <input asp-for="PhoneNumber" class="form-control autosave" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Địa chỉ</label>
+                            <input asp-for="Address" class="form-control autosave" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Hình thức thanh toán</strong></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>Hình thức</label>
+                            <select name="ModeOfPayments[0].Id" class="form-control autosave">
+                                @foreach (var mode in modeOfPayments)
+                                {
+                                    <option value="@mode.Value">@mode.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Số tiền thanh toán</label>
+                            <input name="ModeOfPayments[0].PaymentAmount" id="PaymentAmount" class="form-control autosave" type="number" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Thanh toán</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal chi tiết đơn hàng -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                <a asp-action="Create"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></a>
+
+            </div>
+            <div class="modal-body" id="orderDetailContent">
+                <div class="text-center text-muted">Chưa có nội dung</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        let selectedIndex = document.querySelectorAll("#selectedTable tbody tr").length;
+        const totalAmountInput = document.getElementById("TotalAmount");
+        const totalAmountDisplay = document.getElementById("totalAmountDisplay");
+        const paymentAmountInput = document.getElementById("PaymentAmount");
+        const products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(products));
+
+        // ==== SAVE DRAFT (Ajax) ====
+        function saveDraft() {
+            const form = $("#orderForm");
+            const data = form.serialize();
+            $.post("/Admin/Order/SaveDraft?tabId=@tabId", data);
+        }
+        function saveDraftBeforeSwitch() {
+            saveDraft();
+        }
+
+        $(document).on("input change", ".autosave, .quantity-input", function () {
+            calculateTotal();
+            saveDraft();
+        });
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll("#selectedTable tbody tr").forEach(row => {
+                const qty = parseInt(row.querySelector('.quantity-input').value) || 0;
+                const price = parseInt(row.querySelector('.price-input').value) || 0;
+                total += qty * price;
+            });
+            totalAmountInput.value = total;
+            totalAmountDisplay.innerText = total.toLocaleString() + "₫";
+            paymentAmountInput.value = total;
+        }
+
+        function addToSelected(id, name, price) {
+            const product = products.find(p => p.Id === id);
+            if (!product || (product.Quantity || 0) <= 0) {
+                alert("Sản phẩm này đã hết hàng!");
+                return;
+            }
+
+            const existingRow = document.querySelector(`#selectedTable tbody tr[data-id='${id}']`);
+            if (existingRow) {
+                let qtyInput = existingRow.querySelector('.quantity-input');
+                qtyInput.value = parseInt(qtyInput.value) + 1;
+                calculateTotal();
+                saveDraft();
+                return;
+            }
+            const table = document.querySelector("#selectedTable tbody");
+
+            const row = document.createElement("tr");
+            row.setAttribute("data-id", id);
+            row.innerHTML = `
+                        <td>${name}</td>
+                        <td>
+                            <input type="hidden" name="OrderDetails[${selectedIndex}].Price" class="price-input" value="${price}" />
+                            ${price.toLocaleString()}₫
+                        </td>
+                        <td>
+                            <input type="number" name="OrderDetails[${selectedIndex}].Quantity" value="1" class="form-control quantity-input autosave" min="1" />
+                            <input type="hidden" name="OrderDetails[${selectedIndex}].ProductDetailId" value="${id}" />
+                        </td>
+                        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">X</button></td>
+                    `;
+            table.appendChild(row);
+            row.querySelector('.quantity-input').addEventListener('input', calculateTotal);
+            selectedIndex++;
+            calculateTotal();
+            saveDraft();
+        }
+
+        function removeRow(btn) {
+            btn.closest("tr").remove();
+            calculateTotal();
+            saveDraft();
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector("#searchResults tbody");
+            tbody.innerHTML = "";
+            // Lọc chỉ hiện sản phẩm còn tồn kho > 0
+            const available = data.filter(p => (p.Quantity || 0) > 0);
+
+            available.forEach(p => {
+                const price = p.DisplayPrice ?? p.Price;
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                            <td style="display:none;">${p.QRCode || ""}</td>
+                            <td>${p.Name}</td>
+                            <td>${price.toLocaleString()}₫</td>
+                            <td>${p.Quantity}</td>
+                            <td><button type="button" class="btn btn-sm btn-primary" onclick="addToSelected('${p.Id}', '${p.Name.replace(/'/g, "\\'")}', ${price})">Chọn</button></td>
+                        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("productInput");
+            renderTable(products);
+
+            input.addEventListener("input", function () {
+                const keyword = (this.value || "").toLowerCase().trim();
+                if (!keyword) {
+                    renderTable(products);
+                    return;
+                }
+
+                const productByQR = products.find(p => (p.QRCode || "").toLowerCase() === keyword);
+                if (productByQR) {
+                    const price = productByQR.DisplayPrice ?? productByQR.Price;
+                    if ((productByQR.Quantity || 0) > 0) {
+                        addToSelected(productByQR.Id, productByQR.Name, price);
+                    } else {
+                        alert("Sản phẩm này đã hết hàng!");
+                    }
+                    this.value = "";
+                    renderTable(products);
+                    return;
+                }
+
+                const matched = products.filter(p =>
+                    (p.Quantity || 0) > 0 &&
+                    (p.Id.toLowerCase() === keyword || p.Name.toLowerCase().includes(keyword))
+                );
+                renderTable(matched);
+            });
+
+            calculateTotal();
+        });
+
+        // ==== Submit form ====
+        $("#orderForm").submit(function (e) {
+            e.preventDefault();
+
+            // Kiểm tra có sản phẩm nào không
+            const selectedCount = $("#selectedTable tbody tr").length;
+            if (selectedCount === 0) {
+                $("#errorMessage").text("Vui lòng chọn ít nhất một sản phẩm trước khi thanh toán.");
+                return;
+            }
+
+            var form = $(this);
+            var url = form.attr("action");
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function (result) {
+                    if (typeof result === "object" && result.success === false) {
+                        $("#errorMessage").text(result.message);
+                        return;
+                    }
+
+                    $("#orderDetailContent").html(result);
+                    $("#orderDetailModal").modal("show");
+
+                    form.trigger("reset");
+                    $("#selectedTable tbody").empty();
+                    calculateTotal();
+                },
+                error: function (xhr) {
+                    $("#errorMessage").text("Có lỗi xảy ra khi thanh toán: " + xhr.responseText);
+                }
+            });
+        });
+
+        // Khi show modal chi tiết đơn hàng
+        $("#orderDetailModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+    </script>
+}

@@ -1,0 +1,20 @@
+<svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Biểu tượng hình học (lục giác với đường zig-zag) -->
+  <g transform="translate(12, 12)">
+    <!-- Lục giác với góc mở -->
+    <path d="M 24 0 L 41.57 12 L 41.57 36 L 24 48 L 6.43 36 L 6.43 12" fill="none" stroke="url(#gradient)" stroke-width="1.8" />
+    <!-- Đường zig-zag bên trong -->
+    <path d="M 15 18 L 21 24 L 27 18 L 33 24" fill="none" stroke="#FFFFFF" stroke-width="1.2" />
+    <!-- Gradient cho lục giác -->
+    <defs>
+      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#40C4FF;" />
+        <stop offset="100%" style="stop-color:#FF8A65;" />
+      </linearGradient>
+    </defs>
+  </g>
+  <!-- Chữ StyleZone -->
+  <text x="54" y="36" font-family="Montserrat, sans-serif" font-weight="bold" font-size="24" fill="#40C4FF">StyleZone</text>
+  <!-- Cách điệu chữ Z -->
+  <path d="M 138 30 L 144 36 L 138 42" fill="none" stroke="#FF8A65" stroke-width="1.2" />
+</svg>

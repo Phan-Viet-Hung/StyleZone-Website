@@ -1,0 +1,120 @@
+﻿@using DAL_Empty.Models
+@model API.Domain.Request.ProductRequest.UpdateProductRequest
+
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+    var genderList = Enum.GetValues(typeof(GenderEnum))
+        .Cast<GenderEnum>()
+        .Select(e => new SelectListItem
+        {
+            Value = ((int)e).ToString(),
+            Text = e.ToString()
+        }).ToList();
+
+    var categoryList = ViewBag.Categories as List<SelectListItem> ?? new();
+    var brandList = ViewBag.Brands as List<SelectListItem> ?? new();
+}
+
+@section Styles {
+    <style>
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #5a9bf6, #3d7cd1); /* xanh dương nhạt hơn */
+        }
+
+        input.form-control:focus, textarea.form-control:focus, select.form-select:focus {
+            border-color: #5a9bf6;
+            box-shadow: 0 0 0 0.1rem rgba(90, 155, 246, 0.25);
+        }
+
+        .fw-extra-bold {
+            font-weight: 800 !important;
+        }
+    </style>
+}
+
+<section class="edit-product-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-success text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0 fw-bold"><i class="lni lni-cart"></i> Sửa sản phẩm</h3>
+                        <p class="small mt-1 mb-0 fw-bold">Chỉnh sửa thông tin chi tiết sản phẩm</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Edit" method="post" novalidate>
+                            <!-- Nếu có Id thì có thể thêm input ẩn cho Id -->
+                            <input type="hidden" asp-for="Id" />
+
+                            <!-- Hàng 1: Tên sản phẩm và Giới tính -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Name" class="form-label fw-semibold">Tên sản phẩm</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="lni lni-text-format"></i></span>
+                                        <input asp-for="Name" class="form-control" placeholder="Nhập tên sản phẩm..." />
+                                    </div>
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Gender" class="form-label fw-semibold">Giới tính</label>
+                                    <select asp-for="Gender" class="form-select">
+                                        <option value="">-- Chọn giới tính --</option>
+                                        @foreach (var gender in genderList)
+                                        {
+                                            <option value="@gender.Value">@gender.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <!-- Hàng 2: Danh mục và Thương hiệu -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="CategoryId" class="form-label fw-semibold">Danh mục</label>
+                                    <select asp-for="CategoryId" class="form-select" asp-items="categoryList">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="BrandId" class="form-label fw-semibold">Thương hiệu</label>
+                                    <select asp-for="BrandId" class="form-select" asp-items="brandList">
+                                        <option value="">-- Chọn thương hiệu --</option>
+                                    </select>
+                                    <span asp-validation-for="BrandId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <!-- Mô tả (full width) -->
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-comments-alt"></i></span>
+                                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Thêm mô tả chi tiết..."></textarea>
+                                </div>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="lni lni-save"></i> Lưu thay đổi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

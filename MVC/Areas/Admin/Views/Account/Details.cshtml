@@ -1,0 +1,53 @@
+﻿@model API.Domain.DTOs.AccountDto
+
+@{
+    ViewData["Title"] = "Chi tiết tài khoản";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Chi tiết tài khoản</h2>
+
+    <div class="card">
+        <div class="card-header">
+            Thông tin chi tiết
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Tên</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Ngày sinh</dt>
+                <dd class="col-sm-9">
+                    @(Model.Birthday.HasValue ? Model.Birthday.Value.ToString("dd/MM/yyyy") : "")
+                </dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Số điện thoại</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+                <dt class="col-sm-3">Tên đăng nhập</dt>
+                <dd class="col-sm-9">@Model.UserName</dd>
+
+                <dt class="col-sm-3">Giới tính</dt>
+                <dd class="col-sm-9">@Model.Gender</dd>
+
+                <dt class="col-sm-3">Địa chỉ</dt>
+                <dd class="col-sm-9">@Model.Address</dd>
+
+                <dt class="col-sm-3">Chức vụ</dt>
+                <dd class="col-sm-9">
+                    @Model.roleName
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer text-end">
+            @* <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">Chỉnh sửa</a> *@
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>

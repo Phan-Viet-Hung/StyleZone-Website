@@ -1,0 +1,62 @@
+.pos-container { display: flex; height: calc(100vh - 120px); }
+      .product-list { flex: 1; padding: 15px; border-right: 1px solid #ddd; overflow-y: auto; }
+      .cart-section { flex: 1; padding: 15px; display: flex; flex-direction: column; }
+      .product-form { flex: 1; padding-bottom: 15px; border-bottom: 1px solid #ddd; }
+      .checkout-section { flex: 1; padding-top: 15px; }
+      .pos-form input, .pos-form select, .pos-form button { margin-right: 10px; margin-bottom: 10px; display: inline-block; }
+      .pos-cart { max-height: 300px; overflow-y: auto; }
+      .pos-total { font-size: 1.2em; font-weight: bold; }
+      .product-search { width: 200px; position: relative; }
+      .detail-select { width: 150px; }
+      .detail-input { width: 150px; }
+      .price-input { width: 150px; background-color: #f0f0f0; cursor: not-allowed; }
+      .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+        display: flex;
+        align-items: center;
+      }
+      .autocomplete-items div:hover { background-color: #e9e9e9; }
+      .cart-image { width: 50px; height: auto; }
+      .autocomplete-image { width: 30px; height: auto; margin-right: 10px; }
+      .product-table {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-collapse: collapse;
+      }
+      .product-table th, .product-table td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+      .product-table th {
+        background-color: #f5f5f5;
+      }
+      .table {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-collapse: collapse;
+      }
+      .table th, .table td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+      .table th {
+        background-color: #f5f5f5;
+      }
+      .action-btn { padding: 2px 10px; font-size: 12px; }

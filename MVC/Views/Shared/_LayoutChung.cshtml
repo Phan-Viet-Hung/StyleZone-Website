@@ -1,0 +1,345 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MVC</title>
+    @*  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/CSS/style.css" rel="stylesheet" />
+    <link href="~/css/CSS/Banner+Monthethao.css" rel="stylesheet" />
+    <link href="~/css/CSS/Banner2denfooter.css" rel="stylesheet" />
+    <link href="~/css/CSS/StyleMobile.css" rel="stylesheet" />
+    <link href="~/css/CSS/StylePC.css" rel="stylesheet" />
+    <link href="~/css//CSS/style1.css" rel="stylesheet" />
+    <link href="~/css/CSS/Hearder.css" rel="stylesheet" />
+    <link href="~/css/CSS/Than3.css" rel="stylesheet" />
+    <link href="~/css/CSS/Cart.css" rel="stylesheet" />
+    @*  <link href="~/css/CSS/ThanhToan.css" rel="stylesheet" /> *@
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background: #fff;
+        }
+    </style>
+
+
+</head>
+<body>
+    @{
+        var userName = Context.Request.Cookies["UserName"];
+        var LoginMethod = Context.Request.Cookies["LoginMethod"];
+    }
+    @if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(LoginMethod))
+    {
+        @Html.Partial("_Hearder")
+    }
+    else
+    {
+        @Html.Partial("_HearderLogin")
+    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["SuccessMessagethanhtoan"] != null)
+    {
+        <script>
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '@Html.Raw(TempData["SuccessMessagethanhtoan"])',
+                showConfirmButton: false,
+                showCloseButton: true, // thêm nút X để tắt
+                timer: 20000,
+                timerProgressBar: true,
+                background: '#d4edda', // nền xanh nhạt
+                color: '#155724',      // chữ xanh đậm
+                customClass: {
+                    popup: 'animated tada faster' // hiệu ứng nổ
+                }
+            });
+        </script>
+    }
+
+
+    @if (TempData["Erroaccount"] != null)
+    {
+        <script>
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '@Html.Raw(TempData["Erroaccount"])',
+                showConfirmButton: false,
+                timer: 6000,
+                timerProgressBar: true,
+                background: '#d4edda', // nền xanh nhạt
+                color: '#155724',      // chữ xanh đậm
+                customClass: {
+                    popup: 'animated tada faster'
+                }
+            });
+        </script>
+    }
+    @if (TempData["Errormomothanhtoan"] != null)
+    {
+        <script>
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '@Html.Raw(TempData["Errormomothanhtoan"])',
+                showConfirmButton: false,
+                timer: 6000,
+                timerProgressBar: true,
+                background: '#d4edda', // nền xanh nhạt
+                color: '#155724',      // chữ xanh đậm
+                customClass: {
+                    popup: 'animated tada faster'
+                }
+            });
+        </script>
+    }
+
+
+
+    @RenderBody()
+    @Html.Partial("_Footer")
+    @RenderSection("Scripts", required: false)
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @*  Scrip nav *@
+    <script>
+        const searchToggle = document.getElementById("searchToggle");
+        const searchBox = document.getElementById("searchBox");
+
+        searchToggle.addEventListener("click", function (e) {
+            e.preventDefault();
+            searchBox.classList.toggle("d-none");
+        });
+
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        const thethaoNavLink = document.getElementById('thethaoDropdown');
+        const pickleballLink = document.getElementById('pickleballLink');
+        const thethaoItem = document.getElementById('thethaoItem');
+
+        let activeNavLink = null;
+        let activeDropdownItem = null;
+
+        function clearActive() {
+            navLinks.forEach(l => l.classList.remove('active'));
+            dropdownItems.forEach(item => item.classList.remove('active-item'));
+            activeNavLink = null;
+            activeDropdownItem = null;
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                clearActive();
+                this.classList.add('active');
+                activeNavLink = this;
+                activeDropdownItem = null;
+            });
+        });
+
+        pickleballLink?.addEventListener('click', function (e) {
+            e.preventDefault();
+            clearActive();
+            thethaoNavLink?.classList.add('active');
+            this.classList.add('active-item');
+            activeNavLink = thethaoNavLink;
+            activeDropdownItem = this;
+        });
+
+        thethaoItem?.addEventListener('mouseenter', () => {
+            if (activeNavLink) activeNavLink.classList.add('active');
+            if (activeDropdownItem) activeDropdownItem.classList.add('active-item');
+        });
+
+        thethaoItem?.addEventListener('mouseleave', () => {
+            // giữ nguyên trạng thái active
+        });
+
+        dropdownItems.forEach(item => {
+            if (item !== pickleballLink) {
+                item.addEventListener('click', () => {
+                    clearActive();
+                    const parentDropdown = item.closest('.nav-item.dropdown');
+                    if (parentDropdown) {
+                        const navLink = parentDropdown.querySelector('.nav-link');
+                        if (navLink) {
+                            navLink.classList.add('active');
+                            activeNavLink = navLink;
+                        }
+                    }
+                    item.classList.add('active-item');
+                    activeDropdownItem = item;
+                });
+            }
+        });
+
+        function delayHideDropdown(dropdownItem) {
+            let timeout;
+            dropdownItem.addEventListener('mouseenter', () => {
+                clearTimeout(timeout);
+                dropdownItem.classList.add('show');
+                const menu = dropdownItem.querySelector('.dropdown-menu');
+                if (menu) menu.classList.add('show');
+            });
+            dropdownItem.addEventListener('mouseleave', () => {
+                timeout = setTimeout(() => {
+                    dropdownItem.classList.remove('show');
+                    const menu = dropdownItem.querySelector('.dropdown-menu');
+                    if (menu) menu.classList.remove('show');
+                }, 50);
+            });
+        }
+
+        const namItem = document.querySelector('#dropdownNam')?.closest('.dropdown');
+        const nuItem = document.querySelector('#nudropdownNam')?.closest('.dropdown');
+
+        if (namItem) delayHideDropdown(namItem);
+        if (nuItem) delayHideDropdown(nuItem);
+    </script>
+
+
+    <!-- Môn thể thao  -->
+
+    <script>
+        const carousel = document.getElementById('carousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        const scrollAmount = 216;
+
+        nextBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggles = document.querySelectorAll('.toggle-icon');
+
+            toggles.forEach(function (icon) {
+                const collapseTarget = document.querySelector(icon.getAttribute('data-bs-target'));
+
+                if (collapseTarget) {
+                    collapseTarget.addEventListener('show.bs.collapse', function () {
+                        icon.classList.remove('bi-plus');
+                        icon.classList.add('bi-dash');
+                    });
+                    collapseTarget.addEventListener('hide.bs.collapse', function () {
+                        icon.classList.remove('bi-dash');
+                        icon.classList.add('bi-plus');
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        const searchToggle = document.getElementById("searchToggle");
+        const searchBox = document.getElementById("searchBox");
+
+        searchToggle.addEventListener("click", function (e) {
+            e.preventDefault();
+            searchBox.classList.toggle("d-none");
+        });
+    </script>
+    <script>
+        // Hiển thị popup khi trang tải xong
+        window.onload = function () {
+            document.getElementById("popupPromo").style.display = "flex";
+        };
+
+        // Đóng popup khi bấm nút X
+        function closePopup() {
+            document.getElementById("popupPromo").style.display = "none";
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButtons = document.querySelectorAll(".toggle-submenu");
+
+            toggleButtons.forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    const nextSubmenu = btn.parentElement.nextElementSibling;
+                    if (nextSubmenu && nextSubmenu.classList.contains("submenu")) {
+                        nextSubmenu.classList.toggle("d-none");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!--
+    / Tim Kiem -->
+    <script>
+        const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+        const mobileSearchBar = document.getElementById('mobileSearchBar2');
+        const mobileSearchInput = document.getElementById('mobileSearchBarInput');
+        const mobileSearchClose = document.getElementById('mobileSearchClose');
+
+        mobileSearchBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            mobileSearchBar.classList.add('d-none');
+            mobileSearchInput.classList.remove('d-none');
+            mobileSearchInput.classList.add('d-flex');
+        });
+
+        mobileSearchClose.addEventListener('click', function () {
+            mobileSearchInput.classList.add('d-none');
+            mobileSearchInput.classList.remove('d-flex');
+            mobileSearchBar.classList.remove('d-none');
+        });
+    </script>
+
+    <!-- Dang Nhap  -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const icon = document.getElementById('userIcon');
+            const menu = document.getElementById('userMenu');
+
+            // Toggle khi nhấn vào icon
+            icon.addEventListener('click', function (e) {
+                e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+                menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+            });
+
+            // Ngăn click bên trong menu đóng lại
+            menu.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            // Nhấn bất kỳ đâu ngoài icon/menu thì đóng
+            document.addEventListener('click', function () {
+                menu.style.display = 'none';
+            });
+        });
+    </script>
+
+    <script>
+            window.onpopstate = function(event) {
+            location.reload();
+        };
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+﻿@model API.Domain.Request.OrderRequest.UpdateOrderStatusRequest
+@using DAL_Empty.Models
+
+<div class="container mt-4">
+    <h3 class="mb-3 text-danger">Hủy đơn hàng</h3>
+
+    <form asp-action="CancelOrder" method="post">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="Status" />
+
+        <div class="mb-3">
+            <label class="form-label">Lý do hủy</label>
+            <textarea asp-for="Reason" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

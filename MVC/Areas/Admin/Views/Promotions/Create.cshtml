@@ -1,0 +1,266 @@
+﻿@model API.Domain.Request.PromotionRequest.CreatePromotionRequest
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Tạo chương trình khuyến mãi";
+
+    var discountTypeOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Percentage", Text = "Phần trăm" },
+        new SelectListItem { Value = "FixedAmount", Text = "Giá cố định" }
+    };
+
+    var statusOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Active", Text = "Đang áp dụng" },
+        new SelectListItem { Value = "Inactive", Text = "Chưa áp dụng" },
+        new SelectListItem { Value = "Expired", Text = "Ngừng áp dụng" }
+    };
+}
+
+@section Styles {
+    <style>
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #6cbf6c, #529152);
+        }
+
+        input.form-control:focus, select.form-select:focus {
+            border-color: #529152;
+            box-shadow: 0 0 0 0.1rem rgba(82, 145, 82, 0.25);
+        }
+
+        .fw-extra-bold {
+            font-weight: 800 !important;
+        }
+
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .selected-product-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            margin: 5px;
+            display: inline-block;
+            border-radius: 6px;
+        }
+
+            .selected-product-item span {
+                font-size: 14px;
+            }
+    </style>
+}
+
+<section class="create-promotion-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-success text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0 fw-bold"><i class="lni lni-offer"></i> Tạo chương trình khuyến mãi</h3>
+                        <p class="small mt-1 mb-0 fw-bold">Điền thông tin khuyến mãi chi tiết</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Create" method="post" enctype="multipart/form-data" id="createPromotionForm">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Name" class="form-label fw-semibold">Tên chương trình</label>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountType" class="form-label fw-semibold">Loại giảm giá</label>
+                                    <select asp-for="DiscountType" class="form-select" asp-items="discountTypeOptions"></select>
+                                    <span asp-validation-for="DiscountType" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="StartDate" class="form-label fw-semibold">Ngày bắt đầu</label>
+                                    <input asp-for="StartDate" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="StartDate" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="EndDate" class="form-label fw-semibold">Ngày kết thúc</label>
+                                    <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="EndDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountValue" class="form-label fw-semibold">Giá trị giảm</label>
+                                    <input type="number" asp-for="DiscountValue" class="form-control" />
+                                    <span asp-validation-for="DiscountValue" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6" hidden>
+                                    <label asp-for="Status" class="form-label fw-semibold">Trạng thái</label>
+                                    <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="ImageFile" class="form-label fw-semibold">Ảnh từ máy tính</label>
+                                    <input asp-for="ImageFile" type="file" class="form-control" id="ImageFileInput" onchange="previewImage(this)" />
+                                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                                
+                                <div class="mb-3 d-flex justify-content-center align-items-center">
+                                    <img id="imagePreview" src="#" alt="Preview" style="max-height: 150px; display:none; border-radius:8px;" />
+                                </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
+                                <textarea asp-for="Description" rows="4" class="form-control" placeholder="Thêm mô tả chi tiết..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#productSelectModal">
+                                    Chọn sản phẩm
+                                </button>
+
+                                <div id="ProductDetailIdsContainer"></div>
+                                <div id="SelectedProductsList" class="selected-product-list mt-2"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="lni lni-save"></i> Tạo mới
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal chọn sản phẩm -->
+<div class="modal fade" id="productSelectModal" tabindex="-1" aria-labelledby="productSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="productTable" class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllProducts" /></th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                            <th>Màu</th>
+                            <th>Size</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnAddSelectedProducts" class="btn btn-primary">Thêm sản phẩm đã chọn</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let productTable;
+        let selectedProducts = {};
+        let shouldApplySelection = false;
+
+        function previewImage(input) {
+            const preview = document.getElementById("imagePreview");
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function updateProductDetailIdsInputs(ids) {
+            const container = $('#ProductDetailIdsContainer');
+            container.empty();
+            ids.forEach(id => {
+                container.append(`<input type="hidden" name="ProductDetailIds" value="${id}" />`);
+            });
+        }
+
+        $(document).ready(function () {
+            productTable = $('#productTable').DataTable({
+                ajax: {
+                    url: 'https://localhost:7257/api/product-details/available-for-promotion',
+                    dataSrc: ''
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data) {
+                            return `<input type="checkbox" class="product-select" value="${data.id}" data-name="${data.name}">`;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'quantity' },
+                    { data: 'price', render: $.fn.dataTable.render.number(',', '.', 0, '') },
+                    { data: 'colorName', defaultContent: '<span class="text-muted">Không có</span>' },
+                    { data: 'sizeName', defaultContent: '<span class="text-muted">Không có</span>' },
+                    { data: 'statusName', defaultContent: '<span class="text-muted">Chưa xác định</span>' }
+                ],
+                order: [[1, 'asc']]
+            });
+
+            $('#selectAllProducts').on('click', function () {
+                $('input.product-select', productTable.rows().nodes()).prop('checked', this.checked);
+            });
+
+            $('#btnAddSelectedProducts').on('click', function () {
+                shouldApplySelection = true;
+                $('#productSelectModal').modal('hide');
+            });
+
+            $('#productSelectModal').on('hidden.bs.modal', function () {
+                if (!shouldApplySelection) return;
+
+                selectedProducts = {};
+                let namesHtml = '';
+
+                $('input.product-select:checked', productTable.rows().nodes()).each(function () {
+                    const id = $(this).val();
+                    const name = $(this).data('name');
+                    selectedProducts[id] = name;
+                });
+
+                const ids = Object.keys(selectedProducts);
+                updateProductDetailIdsInputs(ids);
+
+                ids.forEach(id => {
+                    namesHtml += `<div class="selected-product-item"><span>${selectedProducts[id]}</span></div>`;
+                });
+
+                $('#SelectedProductsList').html(namesHtml);
+
+                shouldApplySelection = false;
+            });
+        });
+    </script>
+}

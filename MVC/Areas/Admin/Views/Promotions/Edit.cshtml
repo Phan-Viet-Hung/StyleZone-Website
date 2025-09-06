@@ -1,0 +1,365 @@
+﻿@model API.Domain.Request.PromotionRequest.UpdatePromotionRequest
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Chỉnh sửa chương trình khuyến mãi";
+
+    var discountTypeOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Percentage", Text = "Phần trăm" },
+        new SelectListItem { Value = "FixedAmount", Text = "Giá cố định" }
+    };
+
+    var statusOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Active", Text = "Đang áp dụng" },
+        new SelectListItem { Value = "Inactive", Text = "Chưa áp dụng" },
+        new SelectListItem { Value = "Expired", Text = "Ngừng áp dụng" }
+    };
+}
+
+@section Styles {
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(45deg, #4d9ef7, #306ac3);
+        }
+
+        input.form-control:focus, select.form-select:focus {
+            border-color: #306ac3;
+            box-shadow: 0 0 0 0.1rem rgba(48, 106, 195, 0.25);
+        }
+
+        .fw-extra-bold {
+            font-weight: 800 !important;
+        }
+
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .selected-product-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            margin: 5px;
+            display: inline-block;
+            border-radius: 6px;
+        }
+
+            .selected-product-item span {
+                font-size: 14px;
+            }
+
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+    </style>
+}
+
+<section class="edit-promotion-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-primary text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0 fw-bold"><i class="lni lni-pencil-alt"></i> Chỉnh sửa chương trình khuyến mãi</h3>
+                        <p class="small mt-1 mb-0 fw-bold">Cập nhật thông tin khuyến mãi</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data" id="editPromotionForm" novalidate >
+                            @Html.HiddenFor(m => m.Id)
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Name" class="form-label fw-semibold">Tên chương trình</label>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountType" class="form-label fw-semibold">Loại giảm giá</label>
+                                    <select asp-for="DiscountType" class="form-select" asp-items="discountTypeOptions"></select>
+                                    <span asp-validation-for="DiscountType" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountValue" class="form-label fw-semibold">Giá trị giảm</label>
+                                    <input type="number" asp-for="DiscountValue" class="form-control" />
+                                    <span asp-validation-for="DiscountValue" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6" hidden>
+                                    <label asp-for="Status" class="form-label fw-semibold">Trạng thái</label>
+                                    <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="StartDate" class="form-label fw-semibold">Ngày bắt đầu</label>
+                                    <input asp-for="StartDate" type="datetime-local" class="form-control" readonly />
+                                    <span asp-validation-for="StartDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="EndDate" class="form-label fw-semibold">Ngày kết thúc</label>
+                                    <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="EndDate" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="ImageFile" class="form-label fw-semibold">Ảnh mới (nếu có)</label>
+                                    <input asp-for="ImageFile" type="file" class="form-control" id="ImageFileInput" onchange="previewImage(this)" />
+                                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                                <div class="col-md-6" hidden>
+                                    <label asp-for="ImageUrl" class="form-label fw-semibold">Ảnh cũ</label>
+                                    <input asp-for="ImageUrl" class="form-control" id="ImageUrl" />
+                                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                                </div>
+                                <div class="mb-3 d-flex justify-content-center align-items-center">
+                                    <img id="imagePreview"
+                                         src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "" : $"https://localhost:7257{Model.ImageUrl}")"
+                                         alt="Preview"
+                                         style="max-height: 150px; border-radius:8px; @(string.IsNullOrEmpty(Model.ImageUrl) ? "display:none;" : "display:block;")" />
+                                </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
+                                <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#productSelectModal">
+                                    Chọn sản phẩm
+                                </button>
+                                <div id="ProductDetailIdsContainer"></div>
+                                <div id="SelectedProductsList" class="selected-product-list mt-2"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="lni lni-save"></i> Cập nhật
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Modal chọn sản phẩm -->
+<div class="modal fade" id="productSelectModal" tabindex="-1" aria-labelledby="productSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="productTable" class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllProducts" /></th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                            <th>Màu</th>
+                            <th>Size</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- AJAX data -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnAddSelectedProducts" class="btn btn-primary">Thêm sản phẩm đã chọn</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedProductIds = @Html.Raw(Json.Serialize(Model.ProductDetailIds ?? new List<Guid>()));
+        let productTable;
+        let shouldApplySelection = false;   // (giữ nguyên hành vi khi bấm nút)
+        let isFirstLoad = true;            // ✅ auto-add 1 lần khi view Edit load
+
+        function renderSelectedProducts(products) {
+            const list = document.getElementById("SelectedProductsList");
+            const hiddenInputContainer = document.getElementById("ProductDetailIdsContainer");
+
+            list.innerHTML = "";
+            hiddenInputContainer.innerHTML = "";
+
+            products.forEach(p => {
+                const item = document.createElement("div");
+                item.className = "selected-product-item";
+                item.innerHTML = `<span>${p.name} (${p.code})</span>`;
+                list.appendChild(item);
+
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "ProductDetailIds";
+                input.value = p.id;
+                hiddenInputContainer.appendChild(input);
+            });
+        }
+
+        async function loadSelectedProducts() {
+            if (!selectedProductIds || selectedProductIds.length === 0) return;
+
+            const query = selectedProductIds.map(id => `ids=${id}`).join('&');
+            const response = await fetch(`/ProductDetail/product-details/by-ids?${query}`);
+            if (!response.ok) return;
+            const products = await response.json();
+            renderSelectedProducts(products);
+        }
+
+        $(document).ready(function () {
+            productTable = $('#productTable').DataTable({
+                ajax: {
+                    url: `https://localhost:7257/api/product-details/available-for-promotion`,
+                    data: {
+                        promotionId: '@Model.Id' // loại bỏ sản phẩm đã gán chính Promotion này
+                    },
+                    dataSrc: ''
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data) {
+                            return `<input type="checkbox" class="product-select" value="${data.id}" data-name="${data.name}">`;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'quantity' },
+                    {
+                        data: 'price',
+                        render: $.fn.dataTable.render.number(',', '.', 0, '')
+                    },
+                    { data: 'colorName', defaultContent: '<span class="text-muted">Không có</span>' },
+                    { data: 'sizeName', defaultContent: '<span class="text-muted">Không có</span>' },
+                    { data: 'statusName', defaultContent: '<span class="text-muted">Chưa xác định</span>' }
+                ],
+                order: [[1, 'asc']],
+                initComplete: function () {
+                    // tick checkbox với những sản phẩm đang có trong Promotion
+                    productTable.rows().every(function () {
+                        var data = this.data();
+                        if (selectedProductIds.includes(data.id)) {
+                            $(this.node()).find('input.product-select').prop('checked', true);
+                        }
+                    });
+
+                    loadSelectedProducts(); // hiển thị danh sách sản phẩm đã chọn
+
+                    // ✅ Auto "ấn Thêm sản phẩm đã chọn" 1 lần khi view Edit load (không cần mở modal)
+                    if (isFirstLoad && selectedProductIds.length > 0) {
+                        isFirstLoad = false;
+                        shouldApplySelection = true;
+                        // gọi trực tiếp handler thông qua event 'hidden.bs.modal'
+                        $('#productSelectModal').trigger('hidden.bs.modal');
+                    }
+                }
+            });
+
+            $('#selectAllProducts').on('click', function () {
+                $('input.product-select', productTable.rows().nodes()).prop('checked', this.checked);
+            });
+
+            $('#btnAddSelectedProducts').on('click', function () {
+                shouldApplySelection = true;
+                $('#productSelectModal').modal('hide');
+            });
+
+            $('#productSelectModal').on('hidden.bs.modal', function () {
+                if (!shouldApplySelection) return;
+
+                let selectedProducts = {};
+                let selectedIds = [];
+
+                $('input.product-select:checked', productTable.rows().nodes()).each(function () {
+                    const id = $(this).val();
+                    const name = $(this).data('name');
+                    selectedProducts[id] = name;
+                    selectedIds.push(id);
+                });
+
+                updateProductDetailIdsInputs(selectedIds);
+
+                // Cập nhật hiển thị tên sản phẩm
+                let namesHtml = '';
+                selectedIds.forEach(id => {
+                    namesHtml += `<div class="selected-product-item"><span>${selectedProducts[id]}</span></div>`;
+                });
+                $('#SelectedProductsList').html(namesHtml);
+
+                shouldApplySelection = false;
+            });
+        });
+
+        function updateProductDetailIdsInputs(ids) {
+            selectedProductIds = ids; // cập nhật mảng global
+            const container = document.getElementById("ProductDetailIdsContainer");
+            container.innerHTML = "";
+            ids.forEach(id => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "ProductDetailIds";
+                input.value = id;
+                container.appendChild(input);
+            });
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleImageInput(type) {
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            const urlInputGroup = document.getElementById('urlInputGroup');
+
+            if (type === 'file') {
+                fileInputGroup.style.display = 'block';
+                urlInputGroup.style.display = 'none';
+            } else {
+                fileInputGroup.style.display = 'none';
+                urlInputGroup.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const url = document.getElementById('ImageUrlInput')?.value;
+            const preview = document.getElementById('imagePreview');
+            if (url && url.trim() !== '') {
+                preview.src = url;
+                preview.style.display = 'block';
+                toggleImageInput('url');
+            } else {
+                toggleImageInput('file');
+            }
+        });
+
+    </script>
+}

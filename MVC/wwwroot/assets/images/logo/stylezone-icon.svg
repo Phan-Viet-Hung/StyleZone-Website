@@ -1,0 +1,19 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lục giác với gradient -->
+  <g transform="translate(10, 10)">
+    <path d="M 30 0 L 48.64 15 L 48.64 45 L 30 60 L 11.36 45 L 11.36 15" fill="none" stroke="url(#gradient)" stroke-width="4" />
+    <!-- Đường zig-zag -->
+    <path d="M 20 25 L 25 30 L 30 25 L 35 30" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <!-- Gradient -->
+    <defs>
+      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#40C4FF;" />
+        <stop offset="100%" style="stop-color:#FF8A65;" />
+      </linearGradient>
+    </defs>
+  </g>
+  <!-- Văn bản StyleZone -->
+  <text x="55" y="65" font-family="Montserrat, sans-serif" font-weight="bold" font-size="20" fill="#40C4FF">SZ</text>
+  <!-- Chữ Z cách điệu -->
+  <path d="M 80 60 L 85 65 L 80 70" fill="none" stroke="#FF8A65" stroke-width="2" />
+</svg>

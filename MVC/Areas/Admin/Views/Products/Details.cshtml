@@ -1,0 +1,294 @@
+﻿@model API.Domain.DTOs.ProductDto
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    string defaultImage = "/images/no-image.png";
+
+}
+@section Styles {
+    <style>
+        /* Giữ chiều cao cố định cho bảng chi tiết trong collapse */
+        #details- @Model.Id {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: white;
+        }
+    </style>
+}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow rounded mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mb-3">
+                            <a asp-action="Index" asp-controller="Products" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                        <!-- Thông tin sản phẩm -->
+                        <div class="col-md-6 border-end">
+                            <h2 class="mb-3 text-primary">@Model.Name</h2>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Description))
+                            {
+                                <p><strong>Mô tả:</strong> @Model.Description</p>
+                            }
+
+                            <p>
+                                <strong>Thể loại:</strong> @(string.IsNullOrWhiteSpace(Model.CategoryName) ? "Không có" : Model.CategoryName) <br />
+                                <strong>Thương hiệu:</strong> @(string.IsNullOrWhiteSpace(Model.BrandName) ? "Không có" : Model.BrandName)
+                            </p>
+                            <p><strong>Giới tính:</strong> @Model.GenderName</p>
+                            <p><strong>Tổng số lượng tồn kho:</strong> <span class="fw-bold">@Model.TotalQuantity</span></p>
+                        </div>
+                        <!-- Thông tin meta -->
+                        <div class="col-md-6">
+                            <br />
+                            <br />
+                            <div class="mb-2">
+                                
+                                <strong>Người tạo:</strong> @Model.CreatedBy <br />
+                                <strong>Ngày tạo:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+
+                            <div class="mb-2">
+                                <strong>Người sửa:</strong>
+                                @(Model.UpdatedBy.HasValue ? Model.UpdatedBy.ToString() : "Chưa được sửa") <br />
+                                <strong>Ngày sửa:</strong>
+                                @(Model.UpdatedAt.HasValue ? Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa được sửa")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút hiển thị danh sách chi tiết -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5>Chi tiết sản phẩm</h5>
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-@Model.Id">
+                    Xem chi tiết
+                </button>
+            </div>
+
+            <!-- Bảng chi tiết sản phẩm -->
+            <div class="collapse" id="details-@Model.Id">
+                <!-- Nút tạo + xuất file -->
+            <div class="row mb-3 align-items-center">
+                            <div class="col-md-6">
+                        <a asp-action="Create" asp-route-productId="@Model.Id" asp-controller="ProductDetails" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Thêm sản phẩm chi tiết
+                                </a>
+
+                                <form asp-action="ImportExcel" asp-controller="ProductDetails" method="post" enctype="multipart/form-data" class="d-inline-block" onsubmit="return validateExcel();">
+                                    <label for="excelFile" class="btn btn-outline-secondary btn-sm me-2">
+                                        <i class="bi bi-file-earmark-excel"></i> Nhập Excel
+                                    </label>
+                                    <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" class="d-none" onchange="this.form.submit()" />
+                                    <input type="hidden" name="productId" value="@Model.Id" /> <!-- thêm dòng này -->
+                                </form>
+
+
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a asp-action="Export" asp-controller="ProductDetails" class="text-primary fw-medium">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div>
+                        </div>
+
+            <!-- Bulk Action -->
+            <form asp-action="BulkChangeStatus" asp-controller="ProductDetails" method="post" id="bulkActionForm">
+                 <input type="hidden" name="productId" value="@Model.Id" />
+                <div id="bulkActionBar" class="bg-light border-top p-3 d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                    <div id="selectedCount">Đã chọn <strong>0</strong> chi tiết</div>
+                    <input type="hidden" name="Status" id="bulkStatus" />
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="setBulkStatus('Active')">Áp dụng</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="setBulkStatus('Inactive')">Chưa áp dụng</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="setBulkStatus('OutOfStock')">Hết hàng</button>
+
+                    </div>
+                </div>
+                <div id="selectedIdsContainer"></div>
+
+            </form>
+
+            <!-- Bảng chi tiết sản phẩm -->
+            <div class="table-wrapper table-responsive">
+                <table id="productDetailTable" class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)" /></th>
+                            <th>Ảnh</th>
+                            <th>Tên chi tiết</th>
+                            <th>Màu</th>
+                            <th>Size</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ProductDetails != null && Model.ProductDetails.Any())
+                        {
+                            foreach (var detail in Model.ProductDetails)
+                            {
+                                <tr>
+                                    <td><input type="checkbox" class="rowCheckbox" value="@detail.Id" onclick="updateSelected()" /></td>
+                                    <td>
+                                        <img src="@(string.IsNullOrEmpty(detail.MainImageUrl) ? defaultImage : "https://localhost:7257" + detail.MainImageUrl)" width="50" height="50" style="object-fit: cover;" />
+                                    </td>
+                                    <td>@detail.Name</td>
+                                    <td>@(string.IsNullOrWhiteSpace(detail.ColorName) ? "—" : detail.ColorName)</td>
+                                    <td>@(string.IsNullOrWhiteSpace(detail.SizeName) ? "—" : detail.SizeName)</td>
+
+                                    <td>@detail.Price.ToString("0.##") đ</td>
+                                    <td>@detail.Quantity</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <a class="badge px-3 py-1 rounded-pill text-decoration-none dropdown-toggle @(detail.StatusName switch {
+                                                   "Active" => "bg-success-subtle text-success",
+                                                   "Inactive" => "bg-warning-subtle text-warning",
+                                                   "OutOfStock" => "bg-warning-subtle text-danger",
+                                                   _ => "bg-light text-dark"
+                                               })"
+                                               href="#"
+                                               role="button"
+                                               id="dropdownStatus_@detail.Id"
+                                               data-bs-toggle="dropdown"
+                                               aria-expanded="false">
+                                                @(detail.StatusName == "Active" ? "Đang áp dụng" : detail.StatusName == "Inactive" ? "Chưa áp dụng" : detail.StatusName == "OutOfStock" ? "Hết hàng" : "Không xác định")
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownStatus_@detail.Id">
+                                                @{
+                                                    var statuses = new Dictionary<string, string> {
+                                                        { "Active", "Đang áp dụng" },
+                                                        { "Inactive", "Chưa áp dụng" },
+                                                        { "OutOfStock", "Hết hàng" }
+                                                    };
+                                                }
+                                                @foreach (var statusItem in statuses)
+                                                {
+                                                    if (statusItem.Key != detail.StatusName)
+                                                    {
+                                                        <li>
+                                                            <form asp-controller="ProductDetails" asp-action="ChangeStatus" method="post" class="m-0 p-0">
+                                                                <input type="hidden" name="Id" value="@detail.Id" />
+                                                                <input type="hidden" name="Status" value="@statusItem.Key" />
+                                                                <button type="submit" class="dropdown-item">@statusItem.Value</button>
+                                                            </form>
+                                                        </li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="ProductDetails" asp-action="Details" asp-route-id="@detail.Id" class="lni lni-zoom-in text-info" title="Chi tiết"></a>
+                                        <a asp-controller="ProductDetails" asp-action="Edit" asp-route-id="@detail.Id" class="lni lni-pencil text-primary" title="Chỉnh sửa"></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">Không có chi tiết sản phẩm</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function setBulkStatus(status) {
+            const form = document.getElementById("bulkActionForm");
+            const selectedCheckboxes = document.querySelectorAll(".rowCheckbox:checked");
+
+            if (selectedCheckboxes.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⚠️ Chưa chọn chi tiết nào',
+                    text: 'Vui lòng chọn ít nhất một chi tiết sản phẩm để cập nhật trạng thái.'
+                });
+                return;
+            }
+
+            document.getElementById("bulkStatus").value = status;
+
+            const container = document.getElementById("selectedIdsContainer");
+            container.innerHTML = '';
+
+            selectedCheckboxes.forEach(cb => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "Ids";
+                input.value = cb.value;
+                container.appendChild(input);
+            });
+
+            // Xác nhận trước khi submit
+            let statusLabel = {
+                'Active': 'Đang áp dụng',
+                'Inactive': 'Chưa áp dụng',
+                'OutOfStock': 'Hết hàng'
+            }[status] || 'khác';
+
+            showConfirm(`Bạn có chắc muốn chuyển trạng thái <b>${statusLabel}</b> cho các sản phẩm đã chọn không?`, () => {
+                form.submit();
+            });
+        }
+
+
+        function toggleAll(source) {
+            const checkboxes = document.querySelectorAll(".rowCheckbox");
+            checkboxes.forEach(cb => cb.checked = source.checked);
+            updateSelected();
+        }
+
+        function updateSelected() {
+            const count = document.querySelectorAll(".rowCheckbox:checked").length;
+            const bulkBar = document.getElementById("bulkActionBar");
+            const countSpan = document.getElementById("selectedCount");
+
+            if (count > 0) {
+                bulkBar.classList.add("show");
+                bulkBar.style.display = 'flex';
+                countSpan.innerHTML = `Đã chọn <strong>${count}</strong> chi tiết`;
+            } else {
+                bulkBar.classList.remove("show");
+                bulkBar.style.display = 'none';
+            }
+        }
+
+        $('#productDetailTable').DataTable({
+            language: {
+                search: "Tìm kiếm:",
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                paginate: {
+                    first: "Đầu",
+                    last: "Cuối",
+                    next: "→",
+                    previous: "←"
+                },
+                zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                infoEmpty: "Không có dữ liệu",
+                infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+            },
+            columnDefs: [
+                { targets: [0, 1, 8], orderable: false }
+            ]
+        });
+    </script>
+}

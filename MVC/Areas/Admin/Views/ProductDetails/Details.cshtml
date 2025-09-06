@@ -1,0 +1,237 @@
+﻿@model API.Domain.DTOs.ProductDetailDto
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    var imageUrls = new List<string>();
+
+    if (!string.IsNullOrEmpty(Model.MainImageUrl))
+        imageUrls.Add("https://localhost:7257" + Model.MainImageUrl);
+
+    if (Model.ImageUrls != null && Model.ImageUrls.Any())
+        imageUrls.AddRange(Model.ImageUrls.Select(url => "https://localhost:7257" + url));
+}
+
+@section Styles {
+    <style>
+        .container-limited {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .product-detail-wrapper {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .thumbnails-scroll {
+            max-height: 280px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+
+            .thumbnails-scroll::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+            }
+
+        .color-option {
+            position: relative;
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+        }
+
+        .color-label {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            display: block;
+            transition: 0.2s;
+        }
+
+            .color-label:hover {
+                transform: scale(1.1);
+            }
+
+        .color-radio {
+            display: none;
+        }
+
+            .color-radio:checked + .color-label {
+                border-color: #e60023;
+                box-shadow: 0 0 0 2px rgba(230, 0, 35, 0.3);
+                transform: scale(1.15);
+            }
+
+        .color-label.disabled,
+        .size-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            position: relative;
+        }
+
+            .color-label.disabled::after,
+            .size-btn.disabled::after {
+                content: "✕";
+                color: red;
+                font-weight: bold;
+                font-size: 16px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+        .size-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            margin: 0 6px 6px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+            .size-btn.active {
+                background-color: #007bff;
+                color: white;
+            }
+
+        .thumbnail-list img.active {
+            border: 2px solid red;
+        }
+
+        h3, strong {
+            color: #333;
+        }
+
+        .text-muted {
+            font-size: 14px;
+        }
+
+        .product-price {
+            color: #e60023;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+}
+
+<div class="container-limited">
+    <div class="product-detail-wrapper mt-4">
+        <div class="row gx-4">
+            <!-- Thumbnails -->
+            <div class="col-md-1 d-none d-md-block thumbnails-scroll">
+                @for (int i = 0; i < imageUrls.Count; i++)
+                {
+                    <img src="@imageUrls[i]"
+                         class="img-thumbnail mb-2 @(i == 0 ? "active" : "") thumbnail-image"
+                         style="cursor:pointer; width: 60px; height: 60px;"
+                         data-index="@i" />
+                }
+            </div>
+
+            <!-- Main Image -->
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
+                <img id="main-product-image"
+                     src="@imageUrls.FirstOrDefault()"
+                     class="img-fluid"
+                     style="max-height: 350px; object-fit: contain;" />
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-md-6">
+                <h3>@Model.ProductName - @Model.Name</h3>
+                <p class="text-muted">Mã sản phẩm: <strong id="selected-codeselected-code">@Model.Code</strong></p>
+                <p class="product-price">@Model.Price.ToString("N0") ₫</p>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Danh mục</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrEmpty(Model.CategoryName) ? Model.CategoryName : "Không có")</dd>
+
+                    <dt class="col-sm-4">Chất liệu</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrEmpty(Model.MaterialName) ? Model.MaterialName : "Không có")</dd>
+
+                    <dt class="col-sm-4">Thương hiệu</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrEmpty(Model.BrandName) ? Model.BrandName : "Không có")</dd>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sizeButtons = document.querySelectorAll(".size-btn");
+            const colorRadios = document.querySelectorAll(".color-radio");
+            const selectedCodeSpan = document.getElementById("selected-code");
+            const currentCode = "@Model.Code";
+
+            let lastColor = "@Model.ColorId";
+            let lastSize = "@Model.SizeId";
+
+            colorRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    lastColor = this.value;
+                    filterSizes(lastColor);
+                    updateCode();
+                });
+            });
+
+            sizeButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    if (btn.classList.contains('disabled')) return;
+
+                    sizeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    lastSize = btn.dataset.size;
+                    filterColors(lastSize);
+                    updateCode();
+                });
+            });
+
+            function filterSizes(colorId) {
+                let valid = colorSizeMap[colorId] || [];
+                sizeButtons.forEach(btn => {
+                    btn.classList.toggle('disabled', !valid.includes(btn.dataset.size));
+                });
+            }
+
+            function filterColors(sizeId) {
+                let valid = sizeColorMap[sizeId] || [];
+                colorRadios.forEach(r => {
+                    r.disabled = !valid.includes(r.value);
+                    r.nextElementSibling.classList.toggle('disabled', r.disabled);
+                });
+            }
+
+            function updateCode() {
+                selectedCodeSpan.textContent = currentCode + " (biến thể)";
+            }
+
+            // --- NEW: Thumbnail click changes main image ---
+            const thumbnails = document.querySelectorAll(".thumbnail-image");
+            const mainImage = document.getElementById("main-product-image");
+
+            thumbnails.forEach((thumbnail, index) => {
+                thumbnail.addEventListener("click", () => {
+                    // Change main image src
+                    mainImage.src = thumbnail.src;
+
+                    // Remove active class from all thumbnails
+                    thumbnails.forEach(t => t.classList.remove("active"));
+                    // Add active class to clicked thumbnail
+                    thumbnail.classList.add("active");
+                });
+            });
+        });
+    </script>
+}

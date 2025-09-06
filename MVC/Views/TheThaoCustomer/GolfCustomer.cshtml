@@ -1,0 +1,468 @@
+﻿@using API.DomainCusTomer.DTOs.TheThao
+@model PageGolf
+
+@{
+    ViewData["Title"] = "GolfCustomer";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+
+    var products = Model.Items;
+    var currentPage = Model.CurrentPage;
+    var totalPages = Model.TotalPages;
+    var categoriesname = products.FirstOrDefault()?.CategoryName;
+    var categories = Model.Categories ?? new List<string>();
+    var sizes = Model.Sizes ?? new List<string>();
+    var colors = Model.Colors ?? new List<string>();
+    var genders = Model.Genders;
+}
+<link href="~/wwwroot/css/CSS/ChungImager.css" rel="stylesheet" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@categoriesname</li>
+    </ol>
+</nav>
+
+<div class="container my-4">
+    <div class="row gx-4">
+
+        <!-- ==== FILTER ASIDE ==== -->
+        <aside class="col-12 col-md-4 col-lg-3 sidebar">
+            <h4 class="filter-title">BỘ LỌC</h4>
+            <div class="accordion" id="filterAccordion">
+                <div class="" style="font-weight: bold;">
+                    <form id="filterFormDesktop">
+
+                        <ul class="list-unstyled">
+
+                            <!-- Loại sản phẩm -->
+                            <li class="border-bottom py-2">
+                                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterCategory">
+                                    <span>Loại Sản Phẩm</span>
+                                    <i class="bi bi-plus toggle-icon" data-bs-toggle="collapse" data-bs-target="#filterCategory"></i>
+                                </div>
+                                <div class="collapse" id="filterCategory" data-bs-parent="">
+                                    <div class="mt-2 ps-3">
+                                        @foreach (var product in categories)
+                                        {
+                                            var id = "category-" + product.GetHashCode();
+                                            <div class="form-check">
+                                                <input class="form-check-input" value="@product" name="Product" type="checkbox" id="@id" />
+                                                <label class="form-check-label ms-1" for="@id">@product</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- Kích cỡ -->
+                            <li class="border-bottom py-2">
+                                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterSize">
+                                    <span>Kích Cỡ</span>
+                                    <i class="bi bi-plus toggle-icon" data-bs-toggle="collapse" data-bs-target="#filterSize"></i>
+                                </div>
+                                <div class="collapse" id="filterSize" data-bs-parent="">
+                                    <div class="mt-2 ps-3">
+                                        @foreach (var size in sizes)
+                                        {
+                                            var id = "size-" + size.GetHashCode();
+                                            <div class="form-check">
+                                                <input class="form-check-input" value="@size" name="Sizes" type="checkbox" id="@id">
+                                                <label class="form-check-label ms-1" for="@id">@size</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- Màu sắc -->
+                            <li class="border-bottom py-2">
+                                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterColor">
+                                    <span>Màu Sắc</span>
+                                    <i class="bi bi-plus toggle-icon" data-bs-toggle="collapse" data-bs-target="#filterColor"></i>
+                                </div>
+                                <div class="collapse" id="filterColor">
+                                    <div class="mt-2 ps-3">
+                                        @foreach (var color in colors)
+                                        {
+                                            var id = "color-" + color.GetHashCode();
+                                            <div class="form-check">
+                                                <input class="form-check-input" value="@color" name="Colors" type="checkbox" id="@id">
+                                                <label class="form-check-label ms-1" for="@id">@color</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- Giới tính -->
+                            <li class="border-bottom py-2">
+                                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterGender">
+                                    <span>Giới Tính</span>
+                                    <i class="bi bi-plus toggle-icon" data-bs-toggle="collapse" data-bs-target="#filterGender"></i>
+                                </div>
+                                <div class="collapse" id="filterGender" data-bs-parent="">
+                                    <div class="mt-2 ps-3">
+                                        @foreach (var a in genders)
+                                        {
+                                            var id = "gender-" + a.GetHashCode();
+                                            <div class="form-check">
+                                                <input class="form-check-input" value="@a" name="Genders" type="checkbox" id="@id">
+                                                <label class="form-check-label ms-1" for="@id">@a</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+
+
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ==== MAIN CONTENT ==== -->
+        <main class="col-12 col-md-8 col-lg-9 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap d-none d-md-flex">
+                <h1 class="mb-0" style="font-weight: 400; font-size: 28px;">@categoriesname</h1>
+                <div class="d-flex align-items-center mt-3 mt-md-0">
+                    <label for="sort" class="me-2">Sắp xếp theo:</label>
+                    <select id="sort" class="form-select">
+                        <option value="createdat_desc">Mới nhất</option>
+                        <option value="createdat_asc">Cũ nhất</option>
+                        <option value="price_asc">Giá: Tăng dần</option>
+                        <option value="price_desc">Giá: Giảm dần</option>
+                        <option value="name_asc">Tên: A-Z</option>
+                        <option value="name_desc">Tên: Z-A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Mobile title + dropdowns -->
+            <div class="d-flex justify-content-between align-items-center mb-3 d-md-none">
+                <h1 class="mb-0" style="font-weight: 400; font-size: 24px; ">@categoriesname</h1>
+            </div>
+            <div class="d-flex gap-2 mb-4 d-md-none">
+                <select id="sortMobile" class="form-select">
+                    <option value="createdat_desc">Mới nhất</option>
+                    <option value="createdat_asc">Cũ nhất</option>
+                    <option value="price_asc">Giá: Tăng dần</option>
+                    <option value="price_desc">Giá: Giảm dần</option>
+                    <option value="name_asc">Tên: A-Z</option>
+                    <option value="name_desc">Tên: Z-A</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-custom ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilter" aria-controls="offcanvasFilter"
+                        style="display: inline-flex;align-items: center;padding: 0.375rem 0.75rem;font-size: 1rem;line-height: 1.5;color: #212529; background-color: #fff;border: 1px solid #ced4da;border-radius: 0.375rem;gap: 0.5rem;">
+                    Lọc sản phẩm
+                    <i class="bi bi-chevron-down" style="font-size: 0.75rem;margin-left: 4px;text-shadow: 0 0 0.3px currentColor;"></i>
+                </button>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="row row-cols-2 row-cols-md-4 g-4" id="productGrid">
+
+                @if (products != null && products.Any())
+                {
+                    foreach (var product in products)
+                    {
+                        bool hasActivePromotion = false;
+                        decimal? priceBefore = null;
+                        decimal? priceAfter = null;
+
+                        // Kiểm tra xem có khuyến mãi ACTIVE (Status == "1")
+                        for (int i = 0; i < product.Status.Count; i++)
+                        {
+                            if ((int)product.Status[i] == 1) // "1" = ACTIVE
+                            {
+                                hasActivePromotion = true;
+                                priceAfter = product.Priceafterduction.ElementAtOrDefault(i);
+                                priceBefore = product.PriceBeforeReduction.ElementAtOrDefault(i);
+                                break;
+                            }
+                        }
+
+                        bool noPromotion = product.PromotionProductId == null || !product.PromotionProductId.Any();
+                        bool allInactive = !hasActivePromotion;
+
+                        <div class="col">
+                            @{
+                                var username = Context.Request.Cookies["UserName"] ?? Context.Request.Cookies["LoginMethod"];
+                            }
+                            @if (!string.IsNullOrEmpty(username))
+                            {
+                                <a asp-action="DetailCustomerID" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                                    <div class="product-img-wrapper">
+                                        <img src="@($"https://localhost:7257/{(product.ImageUrls?.ElementAtOrDefault(0) ?? "default1.jpg")}")" class="product-img" />
+                                        <img src="@($"https://localhost:7257/{(product.ImageUrls?.ElementAtOrDefault(1) ?? "default2.jpg")}")" class="product-img-hover" />
+                                    </div>
+                                    <p class="product-name">@product.Name </p>
+
+                                    @if (noPromotion || allInactive || priceBefore == null || priceAfter == null)
+                                    {
+                                        <p class="product-price" style="color: red; font-weight: bold;">
+                                            @String.Format("{0:#,##0}₫", product.Price)
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="product-price">
+                                            <span style="color: red; font-weight: bold;">
+                                                @String.Format("{0:#,##0}₫", priceAfter)
+                                            </span>
+                                            <span style="color: gray; text-decoration: line-through; margin-left: 8px;">
+                                                @String.Format("{0:#,##0}₫", priceBefore)
+                                            </span>
+                                        </p>
+                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="DetailCustomer" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                                    <div class="product-img-wrapper">
+                                        <img src="@($"https://localhost:7257/{(product.ImageUrls?.ElementAtOrDefault(0) ?? "default1.jpg")}")" class="product-img" />
+                                        <img src="@($"https://localhost:7257/{(product.ImageUrls?.ElementAtOrDefault(1) ?? "default2.jpg")}")" class="product-img-hover" />
+                                    </div>
+                                    <p class="product-name">@product.Name</p>
+                                    @if (noPromotion || allInactive || priceBefore == null || priceAfter == null)
+                                    {
+                                        <p class="product-price" style="color: red; font-weight: bold;">
+                                            @String.Format("{0:#,##0}₫", product.Price)
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="product-price">
+                                            <span style="color: red; font-weight: bold;">
+                                                @String.Format("{0:#,##0}₫", priceAfter)
+                                            </span>
+                                            <span style="color: gray; text-decoration: line-through; margin-left: 8px;">
+                                                @String.Format("{0:#,##0}₫", priceBefore)
+                                            </span>
+                                        </p>
+                                    }
+                                </a>
+                            }
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Không có sản phẩm nào.</p>
+                    </div>
+                }
+
+            </div>
+            @if (totalPages > 1)
+            {
+                <nav id="paginationNav" class="mt-4 d-flex justify-content-center" aria-label="Page navigation">
+                    <ul class="pagination">
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            var activeClass = i == currentPage ? "active" : "";
+                            <li class="page-item @activeClass">
+                                <a class="page-link" href="javascript:void(0);" onclick="goToPage(@i)">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </main>
+
+
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFilter" aria-labelledby="offcanvasFilterLabel" style="position: fixed;">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasFilterLabel">BỘ LỌC</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <form id="filterFormMobile">
+                    <ul class="list-unstyled">
+                        <!-- Loại sản phẩm -->
+                        <li class="border-bottom py-2">
+                            <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterCategoryMobile">
+                                <span>Loại Sản Phẩm</span>
+                                <i class="bi bi-plus toggle-icon"></i>
+                            </div>
+                            <div class="collapse" id="filterCategoryMobile">
+                                <div class="mt-2 ps-3">
+                                    @foreach (var product in categories)
+                                    {
+                                        var id = "mobile-category-" + product.GetHashCode();
+                                        <div class="form-check">
+                                            <input class="form-check-input" value="@product" name="Product" type="checkbox" id="@id" />
+                                            <label class="form-check-label ms-1" for="@id">@product</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Kích cỡ -->
+                        <li class="border-bottom py-2">
+                            <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterSizeMobile">
+                                <span>Kích Cỡ</span>
+                                <i class="bi bi-plus toggle-icon"></i>
+                            </div>
+                            <div class="collapse" id="filterSizeMobile">
+                                <div class="mt-2 ps-3">
+                                    @foreach (var size in sizes)
+                                    {
+                                        var id = "mobile-size-" + size.GetHashCode();
+                                        <div class="form-check">
+                                            <input class="form-check-input" value="@size" name="Sizes" type="checkbox" id="@id">
+                                            <label class="form-check-label ms-1" for="@id">@size</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Màu sắc -->
+                        <li class="border-bottom py-2">
+                            <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterColorMobile">
+                                <span>Màu Sắc</span>
+                                <i class="bi bi-plus toggle-icon"></i>
+                            </div>
+                            <div class="collapse" id="filterColorMobile">
+                                <div class="mt-2 ps-3">
+                                    @foreach (var color in colors)
+                                    {
+                                        var id = "mobile-color-" + color.GetHashCode();
+                                        <div class="form-check">
+                                            <input class="form-check-input" value="@color" name="Colors" type="checkbox" id="@id">
+                                            <label class="form-check-label ms-1" for="@id">@color</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Giới tính -->
+                        <li class="border-bottom py-2">
+                            <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#filterGenderMobile">
+                                <span>Giới Tính</span>
+                                <i class="bi bi-plus toggle-icon"></i>
+                            </div>
+                            <div class="collapse" id="filterGenderMobile">
+                                <div class="mt-2 ps-3">
+                                    @foreach (var a in genders)
+                                    {
+                                        var id = "mobile-gender-" + a.GetHashCode();
+                                        <div class="form-check">
+                                            <input class="form-check-input" value="@a" name="Genders" type="checkbox" id="@id">
+                                            <label class="form-check-label ms-1" for="@id">@a</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        const filterFormDesktop = document.getElementById('filterFormDesktop');
+        const filterFormMobile = document.getElementById('filterFormMobile');
+        const sortDesktop = document.getElementById('sort');
+        const sortMobile = document.getElementById('sortMobile');
+        const productGrid = document.getElementById('productGrid');
+
+        // ==== Lấy query string từ bộ lọc + sắp xếp ====
+        function getSelectedFilters(page = 1) {
+            const query = new URLSearchParams();
+
+            [filterFormDesktop, filterFormMobile].forEach(form => {
+                if (!form) return;
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value && value.trim() !== '') {
+                        query.append(key, value);
+                    }
+                }
+            });
+
+            // Lấy sắp xếp từ dropdown theo thiết bị
+            const selectedSort = window.innerWidth < 768 ? sortMobile : sortDesktop;
+            const sortValue = selectedSort?.value;
+            if (sortValue) {
+                const [sortBy, sortOrder] = sortValue.split('_');
+                query.set('SortBy', sortBy);
+                query.set('SortOrder', sortOrder);
+            }
+
+            // Phân trang
+            query.set('Page', page);
+            query.set('PageSize', 12);
+
+            return query.toString();
+        }
+
+        // ==== Hàm gọi API lọc sản phẩm ====
+        function fetchFilteredProducts(page = 1) {
+            const query = getSelectedFilters(page);
+
+            // Tự động lấy URL hiện tại (dùng được cho mọi trang danh mục)
+            const currentPath = window.location.pathname;
+
+            fetch(`${currentPath}?${query}`)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Cập nhật danh sách sản phẩm
+                    const newGrid = doc.getElementById('productGrid');
+                    if (newGrid) {
+                        productGrid.innerHTML = newGrid.innerHTML;
+                    } else {
+                        productGrid.innerHTML = '<div class="col-12">Không có sản phẩm nào.</div>';
+                    }
+
+                    // Cập nhật phân trang
+                    const newPagination = doc.querySelector('nav[aria-label="Page navigation"]');
+                    const oldPagination = document.querySelector('nav[aria-label="Page navigation"]');
+                    if (newPagination && oldPagination) {
+                        oldPagination.innerHTML = newPagination.innerHTML;
+                    } else if (oldPagination) {
+                        oldPagination.innerHTML = '';
+                    }
+                })
+                .catch(err => {
+                    productGrid.innerHTML = '<div class="col-12 text-danger">Lỗi tải dữ liệu.</div>';
+                    console.error('Lỗi khi gọi API sản phẩm:', err);
+                });
+        }
+
+        // ==== Hàm chuyển trang (dùng trong onclick) ====
+        window.goToPage = function (page) {
+            fetchFilteredProducts(page);
+        };
+
+        // ==== Gọi lại khi thay đổi filter (desktop + mobile) ====
+        [filterFormDesktop, filterFormMobile].forEach(form => {
+            if (form) {
+                form.addEventListener('change', () => fetchFilteredProducts(1));
+            }
+        });
+
+        // ==== Gọi lại khi thay đổi sắp xếp ====
+        [sortDesktop, sortMobile].forEach(select => {
+            if (select) {
+                select.addEventListener('change', () => fetchFilteredProducts(1));
+            }
+        });
+    </script>
+}
+
+
+
+

@@ -1,0 +1,74 @@
+﻿@using API.DomainCusTomer.DTOs.ThongTinCaNhaCustomer
+@model UpdateThongTinCaNhanDto
+@{
+    ViewData["Title"] = "TaiKhoanCuaToi";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<link href="~/css/CSS/Taikhoancuatoi.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tài Khoản Của Tôi</li>
+    </ol>
+</nav>
+
+<main>
+    <h1>Hồ Sơ Của Tôi</h1>
+    <p class="subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+    @if (TempData["Errortaikhoancuatoi"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Errortaikhoancuatoi"]
+        </div>
+    }
+
+   
+    <form asp-action="TaiKhoanCuaToi" asp-controller="DonMuaCustomer">
+        <div class="mb-4">
+            <label asp-for="UserName" class="form-label">Tên đăng nhập</label>
+            <input asp-for="UserName" class="form-control" readonly />
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Fullname" class="form-label">Họ tên</label>
+            <input asp-for="Fullname" class="form-control"/>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" readonly />
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
+            <input asp-for="PhoneNumber" class="form-control"  />
+        </div>
+
+            <fieldset class="mb-4">
+                <legend class="form-label pt-0">Giới tính</legend>
+                <div class="d-flex gap-4 align-items-center flex-wrap">
+                    <div class="form-check">
+                        <input asp-for="Gender" class="form-check-input" type="radio" name="Gender" id="male" value="Nam" />
+                        <label class="form-check-label" for="male">Nam</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="Gender" class="form-check-input" type="radio" name="Gender" id="female" value="Nu" />
+                        <label class="form-check-label" for="female">Nữ</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="Gender" class="form-check-input" type="radio" name="Gender" id="other" value="Khac" />
+                        <label class="form-check-label" for="other">Khác</label>
+                    </div>
+                </div>
+            </fieldset>
+        <div class="mb-4">
+            <label asp-for="Birthday" class="form-label">Ngày sinh</label>
+            <input asp-for="Birthday" type="date" class="form-control"   />
+        </div>
+
+        <button type="submit" value="Save" class="btn btn-orange">Lưu</button>
+    </form>
+</main>

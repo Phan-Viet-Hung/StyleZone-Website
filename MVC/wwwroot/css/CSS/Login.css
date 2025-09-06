@@ -1,0 +1,124 @@
+.login-container {
+    max-width: 480px;
+    background-color: white;
+    padding: 40px 30px;
+    margin: 60px auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.login-title {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.underline-title {
+    height: 2px;
+    background-color: red;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+label {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #777;
+}
+
+.form-control {
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    box-shadow: none;
+    padding-left: 0;
+    font-size: 15px;
+}
+
+    .form-control:focus {
+        border-color: black;
+        box-shadow: none;
+    }
+
+.btn-login {
+    width: 100%;
+    border-radius: 0;
+    border: 1px solid black;
+    font-weight: bold;
+    background-color: white;
+    color: black;
+    transition: all 0.3s ease;
+    padding: 10px;
+}
+
+    .btn-login:hover {
+        background-color: black;
+        color: white;
+    }
+
+.btn-google {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #444;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+    .btn-google:hover {
+        background-color: #f1f1f1;
+    }
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.bottom-link {
+    font-size: 14px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+    .bottom-link a {
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+    .login-container {
+        margin: 20px 10px;
+        padding: 25px 15px;
+    }
+
+    .login-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-size: 11px;
+    }
+
+    .form-control {
+        font-size: 16px;
+    }
+
+    .btn-login,
+    .btn-google {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .bottom-link {
+        font-size: 13px;
+    }
+}

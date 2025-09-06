@@ -1,0 +1,85 @@
+﻿@model API.Domain.DTOs.VoucherDto
+@{
+    ViewData["Title"] = "Chi tiết voucher";
+    string defaultImage = "/images/no-image.png";
+}
+
+<section class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Chi tiết voucher</h4>
+        </div>
+        <div class="card-body row">
+            <!-- Ảnh -->
+            <div class="col-md-4 text-center">
+                <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? defaultImage : Model.ImageUrl)" 
+                     alt="Ảnh voucher" 
+                     class="img-thumbnail mb-3" 
+                     style="max-width: 100%; height: auto;" />
+            </div>
+
+            <!-- Thông tin -->
+            <div class="col-md-8">
+                <dl class="row">
+                    <dt class="col-sm-4">Mã khuyến mãi:</dt>
+                    <dd class="col-sm-8 fw-bold text-primary">@Model.Code</dd>
+
+                    <dt class="col-sm-4">Mô tả:</dt>
+                    <dd class="col-sm-8">@Model.Description</dd>
+
+                    <dt class="col-sm-4">Loại giảm giá:</dt>
+                    <dd class="col-sm-8">
+                        @(Model.DiscountType == "Percentage" ? "Phần trăm" : "Giá cố định")
+                    </dd>
+
+                    <dt class="col-sm-4">Giá trị giảm:</dt>
+                    <dd class="col-sm-8">
+                        @Model.DiscountValue.ToString("N0") @(Model.DiscountType == "Percentage" ? "%" : "₫")
+                    </dd>
+
+                    <dt class="col-sm-4">Giá trị đơn hàng tối thiểu:</dt>
+                    <dd class="col-sm-8">
+                        @(Model.MinOrderAmount.HasValue ? Model.MinOrderAmount.Value.ToString("N0") : "0") ₫
+                    </dd>
+
+                    <dt class="col-sm-4">Tổng số lượt dùng:</dt>
+                    <dd class="col-sm-8">@Model.TotalUsageLimit</dd>
+
+                    <dt class="col-sm-4">Tối đa mỗi khách hàng:</dt>
+                    <dd class="col-sm-8">@Model.MaxUsagePerCustomer</dd>
+
+                    <dt class="col-sm-4">Trạng thái:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge px-3 py-1
+                            @(Model.Status switch {
+                                "Active" => "bg-success",
+                                "Inactive" => "bg-warning",
+                                "Expired" => "bg-danger",
+                                _ => "bg-light text-dark"
+                            })">
+                            @(Model.Status switch {
+                                "Active" => "Đang áp dụng",
+                                "Inactive" => "Chưa áp dụng",
+                                "Expired" => "Ngừng áp dụng",
+                                _ => "Không xác định"
+                            })
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Ngày bắt đầu:</dt>
+                    <dd class="col-sm-8">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4">Ngày kết thúc:</dt>
+                    <dd class="col-sm-8">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+
+                <a asp-action="Index" class="btn btn-secondary mt-3">
+                    <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary mt-3 ms-2">
+                    <i class="bi bi-pencil-square"></i> Sửa
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

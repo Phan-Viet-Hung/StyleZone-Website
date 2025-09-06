@@ -1,0 +1,125 @@
+﻿@model API.Domain.DTOs.PromotionDetailDto
+@{
+    ViewData["Title"] = "Chi tiết chương trình khuyến mãi";
+    var promo = Model.Promotion;
+    string defaultImage = "/images/no-image.png";
+    string imageUrl = string.IsNullOrEmpty(promo?.ImageUrl) ? defaultImage : "https://localhost:7257" + promo.ImageUrl;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow rounded mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Ảnh -->
+                        <div class="col-md-5 text-center border-end">
+                            <h5 class="mb-3">Ảnh chương trình</h5>
+                            <img src="@imageUrl" class="img-fluid mb-3 rounded border" style="max-height: 200px;" />
+                        </div>
+
+                        <!-- Thông tin khuyến mãi -->
+                        <div class="col-md-7">
+                            <h2 class="mb-3">@promo?.Name</h2>
+
+                            <p>
+                                <strong>Loại giảm giá:</strong> @promo?.DiscountType <br />
+                                <strong>Giá trị giảm:</strong> @promo?.DiscountValue.ToString("N0") <br />
+                                <strong>Thời gian áp dụng:</strong> @promo?.StartDate.ToString("dd/MM/yyyy") - @promo?.EndDate.ToString("dd/MM/yyyy")
+                            </p>
+
+                            <p>
+                                <strong>Trạng thái:</strong> @promo?.Status <br />
+                                <strong>Số lượng sản phẩm áp dụng:</strong> @promo?.ProductCount
+                            </p>
+
+                            @if (!string.IsNullOrWhiteSpace(promo?.Description))
+                            {
+                                <p><strong>Mô tả:</strong> @promo.Description</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách sản phẩm áp dụng -->
+            <h5 class="mb-3">Các sản phẩm áp dụng</h5>
+            <div class="table-responsive">
+                <table id="promotionProductTable" class="table align-middle table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá gốc</th>
+                            <th>Giá sau giảm</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PromotionProducts.Any())
+                        {
+                            foreach (var item in Model.PromotionProducts)
+                            {
+                                dynamic? productInfo = ViewBag.ProductMap?[item.ProductDetailId.ToString()];
+                                string productName = productInfo?.Name ?? "Không rõ";
+                                string productImage = string.IsNullOrEmpty(productInfo?.MainImageUrl)
+                                ? defaultImage
+                                : "https://localhost:7257" + productInfo.MainImageUrl;
+
+                                <tr>
+                                    <td>
+                                        <img src="@productImage" width="50" height="50" style="object-fit: cover;" />
+                                    </td>
+                                    <td>
+                                        <a asp-controller="ProductDetails" asp-action="Details" asp-route-id="@item.ProductDetailId">
+                                            @productName
+                                        </a>
+                                    </td>
+                                    <td>@item.PriceBeforeDiscount.ToString("N0") đ</td>
+                                    <td>@item.PriceAfterDiscount.ToString("N0") đ</td>
+                                    <td>
+                                        <span class="badge px-3 py-1 rounded-pill @(item.IsActive ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning")">
+                                            @(item.IsActive ? "Đang áp dụng" : "Không áp dụng")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Không có sản phẩm áp dụng</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <a asp-action="Index" class="btn btn-secondary mt-4">← Quay lại danh sách</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#promotionProductTable').DataTable({
+            language: {
+                search: "Tìm kiếm:",
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                paginate: {
+                    first: "Đầu",
+                    last: "Cuối",
+                    next: "→",
+                    previous: "←"
+                },
+                zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                infoEmpty: "Không có dữ liệu",
+                infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+            },
+            columnDefs: [
+                { targets: [0, 4], orderable: false }
+            ]
+        });
+    </script>
+}

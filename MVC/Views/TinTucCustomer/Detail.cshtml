@@ -1,0 +1,133 @@
+﻿@using API.DomainCusTomer.DTOs.Tintuc
+@model TinTucDetailDto
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="TinTucCustomer" asp-action="Index">Tin Tức</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+
+</nav>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto article-container">
+            <article>
+                <header class="mb-4 article-header">
+                    <h1 class="fw-bolder mb-2">@Model.Title</h1>
+                    <div class="text-muted fst-italic mb-3">
+                        Đăng ngày: @Model.CreatedDate.ToString("dd/MM/yyyy")
+                    </div>
+                </header>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <figure class="mb-4 article-featured-image">
+                        <img src="@($"https://localhost:7257/{(Model.ImageUrl ?? "default1.jpg")}")" alt="@Model.Title" />
+                       
+                    </figure>
+                }
+
+                <section class="mb-5 article-content">
+                    @Html.Raw(Model.Content)
+                </section>
+            </article>
+        </div>
+    </div>
+</div>
+
+
+    <style>
+        .article-container {
+            max-width: 860px;
+            padding: 0 15px;
+        }
+
+        .article-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #2c79c1; /* Màu xanh dương nhạt */
+            text-shadow: 1px 1px 2px rgba(44, 121, 193, 0.1);
+        }
+
+        .article-header .text-muted {
+            font-size: 0.95rem;
+            color: #888;
+        }
+
+        .article-featured-image img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .article-content {
+            font-size: 1.15rem;
+            line-height: 1.85;
+            color: #2e2e2e;
+            margin-top: 30px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+            .article-content p {
+                margin-bottom: 1.6rem;
+                text-align: justify;
+            }
+
+            .article-content h2,
+            .article-content h3 {
+                margin-top: 2rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+                color: #2c79c1;
+            }
+
+            .article-content ul, .article-content ol {
+                margin-left: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .article-content blockquote {
+                margin: 1.5rem 0;
+                padding: 1rem 1.5rem;
+                background-color: #f4f8fb;
+                border-left: 4px solid #2c79c1;
+                font-style: italic;
+                color: #444;
+            }
+
+        @@media (max-width: 768px) {
+            .article-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .article-featured-image img {
+                max-height: 320px;
+            }
+
+            .article-content {
+                font-size: 1.05rem;
+                line-height: 1.75;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .article-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .article-content {
+                font-size: 1rem;
+            }
+        }
+    </style>

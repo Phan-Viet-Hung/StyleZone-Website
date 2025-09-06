@@ -1,0 +1,141 @@
+.card-custom {
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    background: #fff;
+    padding: 1.2rem 1.5rem;
+}
+
+.text-red-custom {
+    color: #d70018;
+}
+
+.btn-red {
+    background-color: #d70018;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn-red:hover {
+        background-color: #a30013;
+        transform: translateY(-1px);
+    }
+
+.badge-default {
+    background-color: #fff0f0;
+    color: #d70018;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #d70018;
+}
+
+.underline-link {
+    text-decoration: underline;
+    color: #0d6efd;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.price-total {
+    color: #d70018;
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.product-table th, .product-table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.product-img {
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
+
+.product-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.product-price {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.shop-header {
+    font-size: 0.95rem;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* M?c ??nh ?n card mobile */
+.product-card {
+    display: none;
+}
+
+/* ===== Responsive Mobile ===== */
+@media (max-width: 576px) {
+    body {
+        font-size: 0.9rem;
+    }
+
+    .container {
+        padding: 0.5rem;
+    }
+
+    .card-custom {
+        padding: 1rem;
+    }
+    /* ?n b?ng và dùng layout d?ng th? */
+    .product-table {
+        display: none;
+    }
+
+    .product-card {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        background: #fff;
+    }
+
+        .product-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+    .product-info {
+        flex: 1;
+    }
+
+        .product-info .name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+    .product-meta {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .product-total {
+        font-weight: 600;
+        color: #d70018;
+        font-size: 0.95rem;
+    }
+}

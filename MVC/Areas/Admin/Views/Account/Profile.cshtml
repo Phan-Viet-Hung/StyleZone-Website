@@ -1,0 +1,151 @@
+﻿@model API.Domain.DTOs.AccountDto
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white fw-bold">
+            Thông tin cá nhân
+        </div>
+        <div class="card-body">
+            <form asp-action="UpdateProfile" asp-controller="account" method="post">
+
+                <input type="hidden" asp-for="UserName" />
+                <input type="hidden" asp-for="Name" />
+
+                <!-- Họ và tên -->
+                <div class="profile-row">
+                    <label>Họ và tên</label>
+                    <div class="value">
+                        <span>@Model.Name</span>
+                    </div>
+                </div>
+
+                <!-- Ngày sinh -->
+                <div class="profile-row">
+                    <label>Ngày sinh</label>
+                    <div class="value">
+                        <span>@(Model.Birthday.HasValue ? Model.Birthday.Value.ToString("dd/MM/yyyy") : "")</span>
+                    </div>
+                </div>
+
+                <!-- Giới tính -->
+                <div class="profile-row">
+                    <label>Giới tính</label>
+                    <div class="value">
+                        <span>@Model.Gender</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="profile-row">
+                    <label>Email</label>
+                    <div class="value">
+                        <span>@Model.Email</span>
+                    </div>
+                </div>
+
+                <!-- Số điện thoại -->
+                <div class="profile-row">
+                    <label>Số điện thoại</label>
+                    <div class="value">
+                        <span class="view-mode">@Model.PhoneNumber</span>
+                        <input asp-for="PhoneNumber" name="PhoneNumber" class="form-control form-control-sm edit-mode d-none" />
+                    </div>
+                    <button type="button" class="btn btn-sm btn-light toggle-edit">
+                        <i class="lni lni-pencil text-primary"></i>
+                    </button>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div class="profile-row">
+                    <label>Địa chỉ</label>
+                    <div class="value">
+                        <span class="view-mode">@Model.Address</span>
+                        <input asp-for="Address" class="form-control form-control-sm edit-mode d-none" />
+                    </div>
+                    <button type="button" class="btn btn-sm btn-light toggle-edit">
+                        <i class="lni lni-pencil text-primary"></i>
+                    </button>
+                </div>
+
+                <!-- Tài khoản -->
+                <div class="profile-row">
+                    <label>Tài khoản</label>
+                    <div class="value">
+                        <span>@Model.UserName</span>
+                    </div>
+                </div>
+
+                <!-- Mật khẩu -->
+                <div class="profile-row">
+                    <label>Mật khẩu</label>
+                    <div class="value">
+                        <span class="view-mode">********</span>
+                        <div class="edit-mode d-none">
+                            <input type="password" name="CurrentPassword" class="form-control form-control-sm mb-2" placeholder="Mật khẩu hiện tại" />
+
+                            <input type="password" name="NewPassword" class="form-control form-control-sm mb-2" placeholder="Mật khẩu mới" />
+                            <input type="password" name="ConfirmPassword" class="form-control form-control-sm" placeholder="Xác nhận mật khẩu" />
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-light toggle-edit">
+                        <i class="lni lni-pencil text-primary"></i>
+                    </button>
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="bi bi-save"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-row {
+        display: flex;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-row label {
+            flex: 0 0 150px;
+            font-weight: 500;
+        }
+
+        .profile-row .value {
+            flex: 1;
+        }
+
+        .profile-row button, .profile-row a {
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .profile-row button,
+        .profile-row a {
+            opacity: 1;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".toggle-edit").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const row = btn.closest(".profile-row");
+                row.querySelector(".view-mode").classList.toggle("d-none");
+                row.querySelector(".edit-mode").classList.toggle("d-none");
+            });
+        });
+    </script>
+}

@@ -1,0 +1,485 @@
+﻿@using API.DomainCusTomer.DTOs.MuangayCustomer
+@model MuangaycustomerDto
+@{
+    ViewData["Title"] = "IndexMuaNgay";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+
+
+}
+
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Thanh Toán</li>
+    </ol>
+</nav>
+
+<main class="checkout-container py-3">
+    <div class="container">
+        @if (TempData["ErroValidate"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErroValidate"]
+            </div>
+        }
+        <!-- Tóm tắt đơn hàng -->
+        <form asp-action="CreateGuestOrder" asp-controller="MoMoThanhtoancustomer" class="row g-3 flex-column flex-lg-row-reverse">
+            
+            <div class="col-12 col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h6 h-lg-5 mb-3 text-center text-lg-start">Tóm tắt đơn hàng</h2>
+                        <div class="d-flex mb-3 align-items-center">
+                            <img src="@($"https://localhost:7257/{(Model.ImageUrl ?? "default1.jpg")}")" alt="@Model.Name"
+                                 class="rounded img-fluid me-3 d-block d-sm-inline"
+                                 style="width: 70px; height: 70px; object-fit: cover;">
+                           
+                            <div class="flex-grow-1 small">
+                                <h6 class="mb-1 text-truncate">@Model.Name</h6>
+                                <small class="text-muted d-block">Màu: @Model.ColorName / Size: @Model.SizeName</small>
+                                <p class="mb-0">Số lượng: @Model.Quantity</p>
+                                <p>@Model.Price.ToString("N0")₫</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="OrderItems[0].ProductDetailId" value="@Model.ProductDetailId" />
+                        <input type="hidden" name="OrderItems[0].Quantity" value="@Model.Quantity" />
+                        <input type="hidden" name="OrderItems[0].Price" value="@Model.Price" />
+                        <!-- Ẩn các giá trị sản phẩm gửi lên server -->
+                        <input type="hidden" name="IsFromCart" value="false" />
+
+                        <!-- Mã giảm giá -->
+                       @*  <div class="input-group mb-3">
+                            <input type="text" class="form-control form-control-sm" placeholder="Mã giảm giá" />
+                            <button class="btn btn-secondary btn-sm" disabled>Áp dụng</button>
+                        </div> *@
+
+                        <!-- Tạm tính -->
+                        <ul class="list-unstyled mb-3 small">
+                            <li class="d-flex justify-content-between">
+                                <span>Tạm tính</span>
+                                <span>@Model.Total.ToString("N0")₫</span>
+                            </li>
+                            <li class="d-flex justify-content-between text-muted" id="shippingFeeRow">
+                                <span>Phí vận chuyển</span>
+                                <span class="small" id="shippingFeeText">0₫</span>
+                                <input type="hidden" name="ShippingFee" id="ShippingFee" value="0" />
+                            </li>
+                            <li class="d-flex justify-content-between border-top pt-2">
+                                <strong>Tổng cộng</strong>
+                                <strong class="text-danger fs-5" id="totalAmount">@Model.Total.ToString("N0")₫</strong>
+                                <input type="hidden" name="TotalAmount" id="TotalAmount" value="@Model.Total.ToString("N0")₫" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin giao hàng -->
+            <div class="col-12 col-lg-7 d-flex flex-column">
+                <div class="card shadow-sm flex-grow-1">
+                    <div class="card-body d-flex flex-column">
+                        <div id="shipping-form" novalidate class="flex-grow-1 d-flex flex-column">
+                            <h2 class="h6 h-lg-5 mb-3">Thông tin giao hàng</h2>
+                            <div class="mb-3">
+                                <input type="text" name="FullName" class="form-control form-control-sm" id="fullName" placeholder="Họ và tên" required />
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-12 col-md-12">
+                                    <input type="tel" name="PhoneNumber" class="form-control form-control-sm" id="phoneNumber" placeholder="Số điện thoại" pattern="^0\d{9}$" required />
+                                </div>
+                            </div>
+
+                            <!-- Chọn Tỉnh/Quận/Xã -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-12 col-md-4">
+                                    <select class="form-select form-select-sm" id="province" required>
+                                        <option value="">Tỉnh / thành</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <select class="form-select form-select-sm" id="district" required disabled>
+                                        <option value="">Quận / huyện</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <select  class="form-select form-select-sm" id="ward" required disabled>
+                                        <option value="">Phường / xã</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="hidden" name="Province" value="" id="Province" />
+                            <input type="hidden" name="District" value="" id="District" />
+                            <input type="hidden" name="Ward" value="" id="Ward" />
+                            <div class="mb-3">
+                                <input type="text" name="Address" class="form-control form-control-sm" id="address" placeholder="Địa chỉ (số nhà, tên đường)" required />
+                            </div>
+
+                            <h2 class="h6 h-lg-5 mt-4 mb-3">Phương thức thanh toán</h2>
+                            <div class="vstack gap-2">
+                                <label class="form-check d-flex align-items-center">
+                                    <input type="radio" name="PaymentMethodCode" class="form-check-input me-2"
+                                           value="cod" checked />
+                                    <span class="flex-grow-1">Thanh toán khi nhận hàng (COD)</span>
+                                    <i class="bi bi-truck fs-4 text-muted"></i>
+                                </label>
+                                <label class="form-check d-flex align-items-center">
+                                    <input type="radio" name="PaymentMethodCode" class="form-check-input me-2"
+                                           value="momo" />
+                                    <span class="flex-grow-1">Ví điện tử Momo</span>
+                                    <img src="@Url.Content("~/css/Image/momo.png")" alt="Momo" style="height: 50px;" />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="complete-order-container mt-3">
+                            <button type="submit" class="complete-order-btn" id="btnCompleteOrder">
+                                Hoàn tất đơn hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</main>
+
+
+@section Scripts {
+    <script>
+        const apiLocalGHN = "https://localhost:7257/api/GHN/";
+        const provinceSelect = document.getElementById("province");
+        const districtSelect = document.getElementById("district");
+        const wardSelect = document.getElementById("ward");
+        const shippingFeeText = document.getElementById("shippingFeeText");
+        const totalAmountEl = document.getElementById("totalAmount");
+        const shippingFeeInput = document.getElementById("ShippingFee");
+        const totalAmountInput = document.getElementById("TotalAmount");
+
+        // Tổng giá trị ban đầu (tạm tính)
+        const subTotal = parseInt("@Model.Total".replace(/\./g, ''), 10);
+        let serviceId = 53320; // Service mặc định GHN
+
+        // ----------------- API Helper -----------------
+        async function ghnGet(endpoint) {
+            const res = await fetch(apiLocalGHN + endpoint);
+            if (!res.ok) {
+                console.error("API Error:", res.status, await res.text());
+                return [];
+            }
+            return await res.json();
+        }
+
+        async function ghnPost(endpoint, body) {
+            const res = await fetch(apiLocalGHN + endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+                console.error("API Error:", res.status, await res.text());
+                return [];
+            }
+            return await res.json();
+        }
+
+        // ----------------- Load Provinces -----------------
+        async function loadProvinces() {
+            const provinces = await ghnGet("provinces");
+            provinceSelect.innerHTML = '<option value="">Tỉnh / thành</option>';
+            if (!provinces || provinces.length === 0) return;
+            provinces.forEach(p => {
+                provinceSelect.innerHTML += `<option value="${p.ProvinceID}">${p.ProvinceName}</option>`;
+            });
+        }
+
+        provinceSelect.addEventListener("change", async () => {
+            const provinceID = provinceSelect.value;
+            if (!provinceID) return;
+            const districts = await ghnPost("districts", { province_id: parseInt(provinceID) });
+            districtSelect.innerHTML = '<option value="">Quận / huyện</option>';
+            districts.forEach(d => {
+                districtSelect.innerHTML += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+            });
+            districtSelect.disabled = false;
+            wardSelect.innerHTML = '<option value="">Phường / xã</option>';
+            wardSelect.disabled = true;
+
+            // Cập nhật input hidden cho tỉnh
+            document.getElementById("Province").value = provinceSelect.options[provinceSelect.selectedIndex].text;
+        });
+
+        districtSelect.addEventListener("change", async () => {
+            const districtID = districtSelect.value;
+            if (!districtID) return;
+            const wards = await ghnPost("wards", { district_id: parseInt(districtID) });
+            wardSelect.innerHTML = '<option value="">Phường / xã</option>';
+            wards.forEach(w => {
+                wardSelect.innerHTML += `<option value="${w.WardCode}">${w.WardName}</option>`;
+            });
+            wardSelect.disabled = false;
+
+            // Cập nhật input hidden cho quận
+            document.getElementById("District").value = districtSelect.options[districtSelect.selectedIndex].text;
+        });
+
+        wardSelect.addEventListener("change", async () => {
+            if (districtSelect.value && wardSelect.value) {
+                await getServiceIdAndCalculateFee();
+
+                // Cập nhật input hidden cho phường
+                document.getElementById("Ward").value = wardSelect.options[wardSelect.selectedIndex].text;
+            }
+        });
+
+        // ----------------- Tính phí ship & tổng tiền -----------------
+        async function getServiceIdAndCalculateFee() {
+            try {
+                const body = {
+                    service_id: serviceId,
+                    insurance_value: subTotal,
+                    from_district_id: 1482,
+                    to_district_id: parseInt(districtSelect.value),
+                    to_ward_code: wardSelect.value,
+                    height: 5,
+                    length: 30,
+                    weight: 300,
+                    width: 25
+                };
+                const result = await ghnPost("calculate-fee", body);
+                if (result.total_fee !== undefined) {
+                    const shippingFee = result.total_fee;
+                    const totalAmount = subTotal + shippingFee;
+
+                    // Cập nhật UI
+                    shippingFeeText.textContent = shippingFee.toLocaleString('vi-VN') + "₫";
+                    totalAmountEl.textContent = totalAmount.toLocaleString('vi-VN') + "₫";
+
+                    // Cập nhật input hidden
+                    shippingFeeInput.value = shippingFee;
+                    totalAmountInput.value = totalAmount;
+
+                    console.log("ShippingFee:", shippingFee, "TotalAmount:", totalAmount);
+                } else {
+                    console.error("Không tính được phí vận chuyển:", result);
+                }
+            } catch (err) {
+                console.error("Lỗi tính phí ship:", err);
+            }
+        }
+
+        loadProvinces();
+    </script>
+
+   <script>
+        // ----------------- Xử lý nút Hoàn tất đơn hàng -----------------
+        document.getElementById("btnCompleteOrder").addEventListener("click", async function (e) {
+            e.preventDefault(); 
+
+            const paymentMethod = document.querySelector("input[name='PaymentMethodCode']:checked");
+            if (!paymentMethod) {
+                alert("Vui lòng chọn phương thức thanh toán.");
+                return;
+            }
+
+            const fullName = document.getElementById("fullName").value.trim();
+            if (!fullName) {
+                alert("Vui lòng nhập họ và tên.");
+                return;
+            }
+
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const amount = parseInt(document.getElementById("TotalAmount").value, 10); 
+
+            const orderData = {
+                FullName: fullName,
+                PhoneNumber: phoneNumber,
+                Address: address,
+                ProductDetailId: @Model.ProductDetailId,
+                Quantity: @Model.Quantity,
+                PaymentMethodCode: paymentMethod.value,
+                TotalAmount: amount,
+                IsFromCart: false 
+            };
+
+            try {
+                // Gửi yêu cầu tạo đơn hàng
+                await fetch("/MoMoThanhtoancustomer/CreateGuestOrder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(orderData)
+                });
+
+             
+            } catch (error) {
+                console.error("Lỗi xử lý đơn hàng:", error);
+                alert("Đã xảy ra lỗi khi gửi đơn hàng.");
+            }
+        });
+
+</script>
+}
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    /* Remove card shadows and borders to match the screenshot */
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+    }
+    /* Remove border and background from form-check labels */
+    .form-check.border {
+        border: none !important;
+        background-color: transparent !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    /* Remove input group border and background */
+    .input-group .form-control {
+        border: 1px solid #d1d5db; /* light gray border */
+        background-color: white;
+    }
+
+    .input-group .btn {
+        background-color: #d1d5db;
+        border: 1px solid #d1d5db;
+        color: #6b7280;
+        cursor: not-allowed;
+    }
+
+        .input-group .btn:hover,
+        .input-group .btn:focus {
+            background-color: #d1d5db;
+            color: #6b7280;
+            box-shadow: none;
+        }
+    /* Remove card-body padding to align content */
+    .card-body {
+        padding: 0 !important;
+    }
+    /* Adjust heading spacing */
+    h2.h6.h-lg-5 {
+        font-weight: 400;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+    /* Product summary item */
+    .d-flex.mb-3.align-items-center {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    /* Price styling */
+    .text-end.fw-semibold {
+        font-weight: 400 !important;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    /* Total price styling */
+    .text-danger.fs-5 {
+        font-weight: 600 !important;
+        font-size: 1.25rem !important;
+        color: #111827 !important;
+    }
+    /* Discount code input group spacing */
+    .input-group.mb-3 {
+        margin-bottom: 1rem !important;
+    }
+    /* Remove button shadow and make disabled style consistent */
+    button.btn.btn-primary.w-100.btn-lg {
+        background-color: #2563eb;
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: none;
+        transition: background-color 0.3s ease;
+    }
+
+        button.btn.btn-primary.w-100.btn-lg:hover,
+        button.btn.btn-primary.w-100.btn-lg:focus {
+            background-color: #1d4ed8;
+            box-shadow: none;
+            color: white;
+        }
+   
+    /* Form inputs consistent border and radius */
+    input.form-control-sm,
+    select.form-select-sm {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background-color: white;
+        font-size: 0.875rem;
+        color: #111827;
+    }
+    /* Remove form-check input border and background */
+    .form-check-input {
+        border-radius: 0.375rem;
+        border: 1px solid #d1d5db;
+        width: 1rem;
+        height: 1rem;
+        margin-top: 0;
+    }
+    /* Payment method label styling */
+    .form-check label span.flex-grow-1 {
+        font-weight: 400;
+        color: #111827;
+        font-size: 0.875rem;
+    }
+    /* Payment icons alignment */
+    .form-check label i.bi,
+    .form-check label img {
+        font-size: 1.25rem;
+        height: 1.25rem;
+        width: auto;
+        color: #6b7280;
+    }
+    /* Link back to cart styling */
+    .mt-3.text-center.text-lg-start a.text-decoration-none.small {
+        font-size: 0.875rem;
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+        .mt-3.text-center.text-lg-start a.text-decoration-none.small:hover {
+            text-decoration: underline;
+        }
+    /* Move complete order button to left form bottom */
+    .complete-order-container {
+        margin-top: 1rem;
+        text-align: left;
+    }
+
+    .complete-order-btn {
+        background-color: #dc2626;
+        border: none;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        width: 100%;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+        .complete-order-btn:hover,
+        .complete-order-btn:focus {
+            background-color: #b91c1c;
+            color: white;
+            outline: none;
+        }
+</style>

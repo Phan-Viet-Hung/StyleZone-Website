@@ -1,0 +1,76 @@
+﻿@using API.Domain.DTOs
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var userJson = HttpContextAccessor.HttpContext.Session.GetString("UserData");
+    AccountDto account = null;
+    if (!string.IsNullOrEmpty(userJson))
+    {
+        account = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountDto>(userJson);
+    }
+
+    var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+    var isAuthPage = currentPath.Contains("/mvcauth/login") || currentPath.Contains("/mvcauth/logout");
+
+}
+
+<header class="header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-5 col-md-5 col-6">
+                <div class="header-left d-flex align-items-center">
+                    <div class="menu-toggle-btn mr-15">
+                        <button id="menu-toggle" class="main-btn primary-btn btn-hover">
+                            <i class="lni lni-chevron-left me-2"></i> Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 col-md-7 col-6">
+                <div class="header-right">
+
+                    <!-- Profile -->
+                    <div class="profile-box ml-15">
+                        @if (account != null && !isAuthPage)
+                        {
+                            <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="profile-info">
+                                    <div class="info">
+                                        <div>
+                                            <h6 class="fw-500">@account?.Name</h6>
+                                            <p>@account?.roleName</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profile">
+                                <li>
+                                    <div class="author-info flex items-center !p-1">
+                                        <div class="content" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;">
+                                            <h4 class="text-sm" title="@account?.Name">@account?.Name</h4>
+                                            <a class="text-black/40 text-xs" href="#" title="@account?.Email">
+                                                @account?.Email
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="/admin/account/profile"><i class="lni lni-user"></i> Thông tin cá nhân</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/admin/MVCAuth/logout"><i class="lni lni-exit"></i> Đăng xuất</a></li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <a class="btn btn-primary" href="/admin/MVCAuth/login">
+                                <i class="lni lni-enter"></i> Đăng nhập
+                            </a>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

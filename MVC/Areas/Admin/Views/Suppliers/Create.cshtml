@@ -1,0 +1,79 @@
+﻿@model API.Domain.Request.SupplierRequest.CreateSupplierRequest
+
+@{
+    ViewData["Title"] = "Thêm nhà cung cấp";
+}
+
+<section class="create-supplier-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8 col-md-10">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-primary text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0">
+                            <i class="lni lni-circle-plus align-middle me-2" style="font-size: 1.2em;"></i>
+                            Thêm nhà cung cấp
+                        </h3>
+
+                        <p class="small mt-1 mb-0">Nhập thông tin nhà cung cấp mới</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Create" method="post">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-semibold">Tên nhà cung cấp</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-user"></i></span>
+                                    <input asp-for="Name" class="form-control" placeholder="Nhập tên nhà cung cấp" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Contact" class="form-label fw-semibold">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-phone"></i></span>
+                                    <input asp-for="Contact" class="form-control" placeholder="Nhập số điện thoại liên hệ" />
+                                </div>
+                                <span asp-validation-for="Contact" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label fw-semibold">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-envelope"></i></span>
+                                    <input asp-for="Email" class="form-control" placeholder="Nhập email nhà cung cấp" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Address" class="form-label fw-semibold">Địa chỉ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-map-marker"></i></span>
+                                    <input asp-for="Address" class="form-control" placeholder="Nhập địa chỉ nhà cung cấp" />
+                                </div>
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="lni lni-circle-plus align-middle me-1"></i> Thêm
+                                </button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

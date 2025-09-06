@@ -1,0 +1,94 @@
+﻿@using API.DomainCusTomer.DTOs.SeachCustomer
+@model List<ProductSearchResultDto>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tìm kiếm</li>
+    </ol>
+</nav>
+<div class="container my-5">
+    <h2 class="fw-bold mb-4">Kết quả tìm kiếm</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 border-0 product-card shadow-sm">
+
+                        <div class="product-img-wrapper">
+                            @{
+                                var username = Context.Request.Cookies["UserName"] ?? Context.Request.Cookies["LoginMethod"];
+                            }
+                            @if (!string.IsNullOrEmpty(username))
+                            {
+                                <a asp-action="DetailCustomerID" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                                    @* Sau này thay bằng link chi tiết sản phẩm *@
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrl ?? "default1.jpg")}")" class="card-img-top product-img"
+                                         alt="@product.Name"
+                                         onerror="this.onerror=null;this.src='/images/default.png';">
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrlHover ?? "default2.jpg")}")" class="card-img-top product-img-hover"
+                                         alt="@product.Name"
+                                         onerror="this.onerror=null;this.src='/images/default.png';">
+                                  
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="DetailCustomer" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                                    @* Sau này thay bằng link chi tiết sản phẩm *@
+
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrl ?? "default1.jpg")}")" class="card-img-top product-img"
+                                         alt="@product.Name"
+                                         onerror="this.onerror=null;this.src='/images/default.png';">
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrlHover ?? "default2.jpg")}")" class="card-img-top product-img-hover"
+                                         alt="@product.Name"
+                                         onerror="this.onerror=null;this.src='/images/default.png';">
+                                </a>
+                            }
+
+                        </div>
+
+                        <div class="card-body text-center d-flex flex-column">
+                            <h5 class="card-title fs-6 text-truncate">
+                                <a href="#" class="text-dark text-decoration-none">@product.Name</a>
+                            </h5>
+
+                            <div class="mt-auto">
+                                @if (product.DiscountPrice.HasValue && product.DiscountPrice < product.Price)
+                                {
+                                    <span class="fw-bold text-danger">@product.DiscountPrice?.ToString("N0")đ</span>
+                                    <span class="text-muted text-decoration-line-through ms-2 small">@product.Price.ToString("N0")đ</span>
+                                }
+                                else
+                                {
+                                    <span class="fw-bold text-dark">@product.Price.ToString("N0")đ</span>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3 text-center">
+            <h4>Không tìm thấy sản phẩm nào phù hợp!</h4>
+            <p>Vui lòng thử lại với từ khóa khác.</p>
+        </div>
+    }
+</div>
+
+@* Bạn có thể thêm link tới file CSS cho hiệu ứng ảnh ở đây nếu cần *@
+@section Scripts {
+    <link href="~/css/CSS/ChungImager.css" rel="stylesheet" />
+}
+

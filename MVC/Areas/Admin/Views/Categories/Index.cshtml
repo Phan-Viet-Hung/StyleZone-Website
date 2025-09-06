@@ -1,0 +1,127 @@
+﻿@model List<API.Domain.DTOs.CategoryDto>
+
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <!-- Tiêu đề -->
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh mục</h2>
+                    </div>
+                </div>
+               @*  <div class="col-md-6">
+                    <div class="breadcrumb-wrapper">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="#">Trang chủ</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    Danh sách danh mục
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div> *@
+            </div>
+        </div>
+
+        <!-- Danh sách bảng -->
+        <div class="tables-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-style mb-30">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <!-- Không có nút thêm -->
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a class="text-primary fw-medium" role="button" asp-action="Export">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper table-responsive">
+                            <table id="categoryTable" class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 150px;">ID</th>
+                                        <th style="width: 200px;">Tên danh mục</th>
+                                        <th style="width: 300px;">Mô tả</th>
+                                        <th style="width: 100px;">Số lượng sản phẩm</th>
+                                        <th style="width: 100px;">Tổng số lượng</th>
+                                        <th style="width: 180px;">Ngày tạo</th>
+                                        <th style="width: 180px;">Ngày cập nhật</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td title="@item.Id">
+                                                    @item.Id.ToString().Substring(0, 8)...
+                                                </td>
+                                                <td title="@item.Name">
+                                                    @item.Name
+                                                </td>
+                                                <td title="@item.Description">
+                                                    @item.Description
+                                                </td>
+                                                <td>@item.QuantityProduct</td>
+                                                <td>@item.TotalQuantity</td>
+                                                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>
+                                                    @(item.UpdatedAt.HasValue
+                                                                                                ? item.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                                                : "Chưa cập nhật")
+                                        </td>
+                                    </tr>
+                                                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có danh mục nào.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#categoryTable').DataTable({
+                language: {
+                    search: "Tìm kiếm:",
+                    lengthMenu: "Hiển thị _MENU_ dòng",
+                    info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                    paginate: {
+                        first: "Đầu",
+                        last: "Cuối",
+                        next: "→",
+                        previous: "←"
+                    },
+                    zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                    infoEmpty: "Không có dữ liệu",
+                    infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+                }
+            });
+        });
+    </script>
+}

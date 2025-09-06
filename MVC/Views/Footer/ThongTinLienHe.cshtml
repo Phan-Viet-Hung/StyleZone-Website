@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewData["Title"] = "ThongTinLienHe";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active current" aria-current="page">Thông tin liên hệ</li>
+    </ol>
+</nav>
+<main class="container py-4">
+    <div class="mx-auto bg-white p-4 p-md-5 shadow-sm rounded" style="max-width: 960px;">
+        <h1 class="fw-bold text-uppercase border-bottom pb-2 mb-4 border-danger border-2">Liên hệ</h1>
+
+        <div class="row">
+            <!-- Thông tin liên hệ + Form -->
+            <div class="col-md-7">
+                <div class="mb-4 p-3 border rounded">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="fw-bold">Điện thoại</h6>
+                            <p class="mb-1">0373893515</p>
+                            <small class="text-muted">Thứ 2 đến thứ 6 (Thứ 7, CN và ngày lễ nghỉ)</small>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="fw-bold">Mạng xã hội</h6>
+                            <a href="https://www.facebook.com/profile.php?id=61578887938821"><p class="mb-1"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</p></a>
+                            <p class="mb-1"><i class="fab fa-instagram me-2 text-danger"></i>Instagram</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logo thương hiệu -->
+            <div class="col-md-5 text-center d-flex align-items-center justify-content-center">
+                <img src="~/css/Image/logo_compact.webp" alt="Style Zone Logo" class="img-fluid" style="max-height: 280px;" />
+            </div>
+
+        </div>
+    </div>
+</main>

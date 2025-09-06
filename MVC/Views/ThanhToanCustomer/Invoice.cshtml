@@ -1,0 +1,64 @@
+﻿@* @model API.DomainCusTomer.DTOs.ThanhToanCustomer.ThanhToanCustomerDto
+
+@{
+    ViewData["Title"] = "Hóa đơn";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Hóa đơn</li>
+    </ol>
+</nav>
+
+<main class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Hóa đơn - @Model.OrderId</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Khách hàng:</strong> @Model.CustomerName</p>
+            <p><strong>SĐT:</strong> @Model.PhoneNumber</p>
+            <p><strong>Địa chỉ:</strong> @Model.Address</p>
+
+            <table class="table table-bordered mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">SL</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-end">@item.Price.ToString("N0")₫</td>
+                            <td class="text-end">@((item.Quantity * item.Price).ToString("N0"))₫</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                        <td class="text-end text-danger fw-bold">@Model.TotalAmount.ToString("N0")₫</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="ExportPdf" asp-route-orderId="@Model.OrderId" class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Tải PDF
+                </a>
+                <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">
+                    Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+ *@

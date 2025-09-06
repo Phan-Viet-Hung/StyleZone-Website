@@ -1,0 +1,150 @@
+﻿@model KeyValuePair<string, List<API.DomainCusTomer.DTOs.TrangChu.HomeProductCustomerDto>>
+
+<div class="container">
+    <div class="bg-white pb-3 mt-5">
+        @* Tên danh mục sẽ được lấy tự động *@
+        <h2 class="fw-bold text-uppercase">@Model.Key</h2>
+    </div>
+
+    <div class="row g-4">
+        @* Lặp qua danh sách sản phẩm được truyền vào *@
+        @foreach (var product in Model.Value)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                @{
+                    var username = Context.Request.Cookies["UserName"] ?? Context.Request.Cookies["LoginMethod"];
+                }
+                @if (!string.IsNullOrEmpty(username))
+                {
+                    <a asp-action="DetailCustomerID" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                        <div class="product-card">
+
+                            @* Container ảnh *@
+                            <div class="product-img-wrapper mb-3">
+                             
+                                <img src="@($"https://localhost:7257/{(product.ImageUrl ?? "default1.jpg")}")" alt="@product.Name" class="product-img" />
+
+                                @if (!string.IsNullOrEmpty(product.ImageUrlHover))
+                                {
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrlHover ?? "default1.jpg")}")" alt="@product.Name Hover" class="product-img-hover" />
+                                   
+                                }
+                            </div>
+
+
+                            @* Tên sản phẩm *@
+                            <p class="product-name">@product.Name</p>
+
+                            @* Giá sản phẩm *@
+                            <div>
+                                @if (product.DiscountPrice.HasValue && product.DiscountPrice < product.Price)
+                                {
+                                    <span style="text-decoration: line-through; color: #888; font-size: 0.9rem;">@product.Price.ToString("N0")₫</span>
+                                    <span style="color: red; font-weight: bold; font-size: 1rem;" class="ms-2">@product.DiscountPrice.Value.ToString("N0")₫</span>
+                                }
+                                else
+                                {
+                                    <span style="color: red; font-weight: bold; font-size: 1rem;">@product.Price.ToString("N0")₫</span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="DetailCustomer" asp-controller="DetailCustomer" asp-route-id="@product.Id" class="text-decoration-none">
+                        <div class="product-card">
+
+                            @* Container ảnh *@
+                            <div class="product-img-wrapper mb-3">
+                                <img src="@($"https://localhost:7257/{(product.ImageUrl ?? "default1.jpg")}")" alt="@product.Name" class="product-img" />
+
+                                @if (!string.IsNullOrEmpty(product.ImageUrlHover))
+                                {
+                                    <img src="@($"https://localhost:7257/{(product.ImageUrlHover ?? "default1.jpg")}")" alt="@product.Name Hover" class="product-img-hover" />
+                                }
+                            </div>
+
+
+                            @* Tên sản phẩm *@
+                            <p class="product-name">@product.Name</p>
+
+                            @* Giá sản phẩm *@
+                            <div>
+                                @if (product.DiscountPrice.HasValue && product.DiscountPrice < product.Price)
+                                {
+                                    <span style="text-decoration: line-through; color: #888; font-size: 0.9rem;">@product.Price.ToString("N0")₫</span>
+                                    <span style="color: red; font-weight: bold; font-size: 1rem;" class="ms-2">@product.DiscountPrice.Value.ToString("N0")₫</span>
+                                }
+                                else
+                                {
+                                    <span style="color: red; font-weight: bold; font-size: 1rem;">@product.Price.ToString("N0")₫</span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+               
+            </div>
+        }
+    </div>
+</div>
+@section Styles {
+    <style>
+        .product-img-wrapper {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-img,
+        .product-img-hover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .product-img-hover {
+            opacity: 0;
+        }
+
+        .product-img-wrapper:hover .product-img-hover {
+            opacity: 1;
+        }
+
+        .product-card {
+            background-color: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin: 0 0 8px;
+            font-size: 0.95rem;
+            color: #333;
+            min-height: 40px;
+        }
+
+        @@media (max-width: 767.98px) {
+            .product-img-wrapper {
+                aspect-ratio: 1 / 1;
+            }
+        }
+    </style>
+}

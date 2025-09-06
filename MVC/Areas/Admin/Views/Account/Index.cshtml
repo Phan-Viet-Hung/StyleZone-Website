@@ -1,0 +1,225 @@
+﻿@model IEnumerable<API.Domain.DTOs.AccountDto>
+@{
+    ViewData["Title"] = "Danh sách tài khoản";
+}
+@section Styles {
+    <style>
+        .table td, .table th {
+            max-width: 120px;
+            word-break: break-word;
+            white-space: normal;
+        }
+    </style>
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh sách tài khoản</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <form asp-action="ToggleActiveStatus" method="post" id="bulkActionForm">
+            <div id="bulkActionBar" class="bg-light border-top p-3 d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                <div id="selectedCount">Đã chọn <strong>0</strong> tài khoản</div>
+                <input type="hidden" name="IsActive" id="bulkIsActive" />
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-outline-success" onclick="setBulkActiveStatus(true)">Kích hoạt</button>
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="setBulkActiveStatus(false)">Vô hiệu hóa</button>
+                </div>
+            </div>
+            <div id="selectedIdsContainer"></div>
+        </form>
+
+        <!-- Table -->
+        <div class="tables-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-style mb-30">
+                        <div class="row mb-3 align-items-center">
+                            <div class="col-md-6">
+                                <a asp-action="Create" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Tạo tài khoản
+                                </a>
+
+                                <form asp-action="ImportFromExcel" method="post" enctype="multipart/form-data" class="d-inline-block" onsubmit="return validateExcel();">
+                                    <label for="excelFile" class="btn btn-outline-secondary btn-sm me-2">
+                                        <i class="bi bi-file-earmark-excel"></i> Nhập Excel
+                                    </label>
+                                    <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" class="d-none" onchange="this.form.submit()" />
+                                </form>
+                            </div>
+                            @* <div class="col-md-6 text-end">
+                                <a asp-action="ExportPdf" class="text-primary fw-medium">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div> *@
+                        </div>
+
+                        <div class="table-wrapper table-responsive">
+                            <table id="accountTable" class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)" /></th>
+                                        <th>Tên</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Điện thoại</th>
+                                        <th>Chức vụ</th>
+                                        <th>Giới tính</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày sinh</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var acc in Model)
+                                    {
+                                        <tr>
+                                            <td><input type="checkbox" class="rowCheckbox" value="@acc.Id" onclick="updateSelected()" /></td>
+                                            <td>@acc.Name</td>
+                                            <td>@acc.UserName</td>
+                                            <td>@acc.Email</td>
+                                            <td>@acc.PhoneNumber</td>
+                                            <td>@acc.roleName</td>
+                                            <td>@(acc.Gender==DAL_Empty.Models.GenderEnum.Nam ?"Nam" :"Nữ")</td>
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input toggle-active"
+                                                           type="checkbox"
+                                                           role="switch"
+                                                           data-id="@acc.Id"
+                                                    @(acc.IsActive ? "checked" : "") />
+                                                </div>
+                                            </td>
+                                            <td>@acc.Birthday</td>
+                                            <td>
+                                                <a asp-action="Details" asp-route-phoneNumber="@acc.PhoneNumber" class="lni lni-eye text-info" title="Chỉnh sửa"></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+            function setBulkActiveStatus(isActive) {
+            const form = document.getElementById("bulkActionForm");
+            const container = document.getElementById("selectedIdsContainer");
+            container.innerHTML = '';
+
+            const selectedIds = document.querySelectorAll(".rowCheckbox:checked");
+            let index = 0;
+            selectedIds.forEach(cb => {
+                const inputId = document.createElement("input");
+                inputId.type = "hidden";
+                inputId.name = `accounts[${index}].Id`;
+                inputId.value = cb.value;
+
+                const inputActive = document.createElement("input");
+                inputActive.type = "hidden";
+                inputActive.name = `accounts[${index}].IsActive`;
+                inputActive.value = isActive;
+
+                container.appendChild(inputId);
+                container.appendChild(inputActive);
+
+                index++;
+            });
+
+            form.submit();
+        }
+
+
+        function toggleAll(source) 
+        {
+            document.querySelectorAll(".rowCheckbox").forEach(cb => {
+                cb.checked = source.checked;
+            });
+            updateSelected();
+        }
+
+        function updateSelected() 
+        {
+            const count = document.querySelectorAll(".rowCheckbox:checked").length;
+            const bulkBar = document.getElementById("bulkActionBar");
+            const countSpan = document.getElementById("selectedCount");
+
+            if (count > 0) 
+            {
+                bulkBar.style.display = 'flex';
+                countSpan.innerHTML = `Đã chọn <strong>${count}</strong> tài khoản`;
+            } else 
+            {
+                bulkBar.style.display = 'none';
+            }
+        }
+
+        function validateExcel() 
+        {
+            const fileInput = document.getElementById("excelFile");
+            const file = fileInput.files[0];
+            if (!file || !file.name.match(/\.(xlsx|xls)$/)) {
+                alert("Vui lòng chọn tệp Excel hợp lệ (.xlsx hoặc .xls)");
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () 
+        {
+            document.querySelectorAll(".toggle-active").forEach(function (toggle) 
+            {
+                toggle.addEventListener("change", function () 
+                {
+                    const id = this.getAttribute("data-id");
+                    const isChecked = this.checked;
+
+                fetch(`/Admin/Account/Toggle/${id}`, {
+                    method: "POST"
+                    })
+
+                        .then(res => {
+                            if (!res.ok) throw new Error("Không thể cập nhật trạng thái");
+                        })
+                        .catch(() => {
+                            alert("Đã xảy ra lỗi khi cập nhật trạng thái");
+                            this.checked = !isChecked;
+                        });
+                });
+            });
+        });
+
+        $('#accountTable').DataTable({
+            language: {
+                search: "Tìm kiếm:",
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                paginate: {
+                    first: "Đầu",
+                    last: "Cuối",
+                    next: "→",
+                    previous: "←"
+                },
+                zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                infoEmpty: "Không có dữ liệu",
+                infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+            },
+            columnDefs: [{ targets: [0, 9], orderable: false }]
+        });
+    </script>
+}

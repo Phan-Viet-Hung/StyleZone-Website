@@ -1,0 +1,56 @@
+.otp-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px 25px;
+    border: 1px solid #ccc;
+    background-color: white;
+}
+
+.otp-input {
+    letter-spacing: 0.3em;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.timer {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.btn:focus {
+    box-shadow: none;
+}
+
+.form-control {
+    border-radius: 0 !important;
+}
+
+.btn {
+    border-radius: 0 !important;
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+    .otp-container {
+        margin: 20px 10px; /* giảm margin để fit màn hình */
+        padding: 20px 15px; /* padding nhỏ hơn */
+    }
+
+    .otp-input {
+        font-size: 1.4rem; /* chữ to hơn cho dễ nhập */
+        letter-spacing: 0.4em;
+    }
+
+    .btn {
+        width: 100%; /* nút full chiều ngang */
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    .timer {
+        font-size: 1rem;
+        text-align: center;
+        display: block;
+        margin-top: 10px;
+    }
+}

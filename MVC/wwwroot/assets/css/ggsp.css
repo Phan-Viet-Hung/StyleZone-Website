@@ -1,0 +1,29 @@
+.card {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    border: 2px solid #eee;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .bottom-btn {
+    text-align: right;
+    margin-top: 20px;
+  }
+  .right-panel {
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .summary-box {
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+  }

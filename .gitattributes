@@ -1,0 +1,8 @@
+# Luôn chuẩn hoá line endings thành LF trong repo
+* text=auto eol=lf
+
+# Nếu bạn muốn Windows dùng CRLF khi checkout
+*.cs text eol=crlf
+*.cshtml text eol=crlf
+*.css text eol=crlf
+*.js text eol=crlf

@@ -1,0 +1,140 @@
+/* === MOBILE MENU & BOTTOM BAR === */
+    .mobile-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #e60012;
+      color: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      z-index: 1030;
+    }
+
+    .mobile-bottom-bar a {
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .mobile-bottom-bar i {
+      font-size: 18px;
+      display: block;
+    }
+
+    .offcanvas-body .nav-link {
+      padding: 10px 0;
+      font-weight: 500;
+    }
+    .submenu {
+     transition: all 0.3s ease;
+    }
+
+    .toggle-submenu {
+    border: none;
+    background: transparent;
+    }
+    .mobile-top i {
+    color: #000; /* Màu đen */
+   }
+    .search-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1050;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  } 
+    #mobileSearchBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1050;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+      .mobileSearchBar2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1050;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      margin-bottom: 30px;
+    }
+    #mobileSearchBar2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+     
+      z-index: 1050;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      margin-bottom: 30px;
+    }
+      #offcanvasFilter1 {
+      position: fixed !important;
+      z-index: 9999 !important;
+    }
+    #mobileMenu {
+      width: 280px !important; /* hoặc 260px, tuỳ bạn */
+    z-index: 1200 !important; /* cao hơn navbar và overlay */ /* đổ bóng nhẹ */
+    }
+    
+    #mobileSearchBarInput {
+  z-index: 1060; /* cao hơn header */
+}
+    /* Hide desktop navbar on mobile */
+    @media (max-width: 991px) {
+      .navbar {
+        display: none;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .mobile-top,
+      .mobile-bottom-bar {
+        display: none !important;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 150px;
+      font-size: 14px;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: #f8f9fa;
+      color: #e60012;
+    }
+
+      #userMenu {
+        background: white;
+        border-radius: 8px;
+        border-top: 3px solid #e60012; /* Viền đỏ phía trên */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 140px;
+        padding: 0.5rem 1rem;
+        z-index: 1000;
+      }
+
+      #userMenu a {
+        display: block;
+        padding: 8px 0;
+        color: #000;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      #userMenu a:hover {
+        background-color: #f8f9fa;
+        color: #e60012;
+        border-radius: 4px;
+      }

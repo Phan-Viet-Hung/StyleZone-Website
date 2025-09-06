@@ -1,0 +1,431 @@
+﻿@{
+    // Lưu Count vào Session khi trang load
+    var a = Context.Session.GetString("ProductCount") ?? "0";
+}
+
+<div class="mobile-top d-flex d-lg-none justify-content-between align-items-center px-3 py-2 border-bottom" id="mobileSearchBar2">
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <i class="bi bi-list fs-1"></i>
+        </button>
+        <a href="#" id="mobileSearchBtn"><i class="bi bi-search fs-5"></i></a>
+    </div>
+
+    <a asp-controller="Home" asp-action="Index" class="navbar-brand m-0">
+        <img src="~/css/Image/logo_compact.webp" alt="Style Zone Logo" height="30" />
+    </a>
+
+    <div class="d-flex align-items-center gap-3 position-relative">
+        <a id="userIcon"><i class="bi bi-person fs-5"></i></a>
+
+        <div id="userMenu" class="position-absolute bg-white shadow-sm border rounded px-3 py-2" style="top: 120%; right: 0; display: none; z-index: 1000;">
+            <a asp-controller="LoginAccount" asp-action="Login" class="d-block text-dark py-1">Đăng nhập</a>
+            <a asp-controller="LoginAccount" asp-action="SendOtppRegister" class="d-block text-dark py-1">Đăng ký</a>
+            <li><a class="dropdown-item" asp-controller="MoMoThanhtoancustomer" asp-action="Tracuudonhang" class="d-block text-dark py-1">Tra cứu đơn hàng</a></li>
+        </div>
+
+        <a asp-action="CartCustomerIndex" asp-controller="CartCustomer" class="position-relative">
+            <i class="bi bi-cart fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@a</span>
+        </a>
+    </div>
+</div>
+
+<!-- Thanh tìm kiếm hiện ra khi nhấn kính lúp -->
+<!-- Thanh tìm kiếm khi nhấn vào icon search -->
+@* <div id="mobileSearchBarInput" class="position-fixed top-0 start-0 w-100 bg-white d-none align-items-center px-3 py-2 border-bottom shadow" style="z-index: 1060;">
+    <button class="btn p-0 border-0 bg-transparent me-2" id="mobileSearchClose">
+        <i class="bi bi-x fs-2"></i>
+    </button>
+    <input type="text" class="form-control border-0 shadow-none flex-grow-1" placeholder="Bạn muốn tìm gì..." />
+    <button class="btn p-0 border-0 bg-transparent ms-2">
+        <i class="bi bi-search fs-5"></i>
+    </button>
+</div> *@
+
+<div>
+    <form method="get" asp-controller="SeachCustomer" asp-action="Index" id="mobileSearchBarInput" class="position-fixed top-0 start-0 w-100 bg-white d-none align-items-center px-3 py-2 border-bottom shadow" style="z-index: 1060;">
+        <button class="btn p-0 border-0 bg-transparent me-2" id="closeSearchBtn" type="button">
+            <i class="bi bi-x fs-4"></i>
+        </button>
+        <input type="text" name="keyword" class="form-control border-0 shadow-none flex-grow-1" placeholder="Bạn muốn tìm gì...">
+        <button class="btn p-0 border-0 bg-transparent ms-2" type="submit">
+            <i class="bi bi-search fs-5"></i>
+        </button>
+    </form>
+</div>
+
+
+<!-- OFFCANVAS MENU -->
+<div class="offcanvas offcanvas-start offcanvasFilter1" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="list-group list-group-flush" id="mobileMenuList">
+            <!-- THỂ THAO -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><a asp-controller="TheThaoCustomer" asp-action="TheThaoCustomer" class="text-dark text-decoration-none">THỂ THAO</a></span>
+                <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+            </li>
+            <ul class="list-group list-group-flush submenu d-none ps-3">
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="PICKLEBALLCustomer" class="text-dark text-decoration-none">PICKLEBALL</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="ChayBoCustomer" class="text-dark text-decoration-none">CHẠY BỘ</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="TapLuyenCustomer" class="text-dark text-decoration-none">TẬP LUYỆN</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="BongRoCustomer" class="text-dark text-decoration-none">BÓNG RỔ</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="CauLongCustomer" class="text-dark text-decoration-none">CẦU LÔNG</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="BongDaCustomer" class="text-dark text-decoration-none">BÓNG ĐÁ</a></li>
+                <li class="list-group-item"><a asp-controller="TheThaoCustomer" asp-action="GolfCustomer" class="text-dark text-decoration-none">GOLF</a></li>
+            </ul>
+
+            <!-- THỜI TRANG -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><a asp-controller="ThoiTrangCustomerMVC" asp-action="ThoiTrangCusTomer" class="text-dark text-decoration-none">THỜI TRANG</a></span>
+                <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+            </li>
+            <ul class="list-group list-group-flush submenu d-none ps-3">
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="WADECusTomer" class="text-dark text-decoration-none">WADE</a></li>
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="BADFIVECusTomer" class="text-dark text-decoration-none">BADFIVE</a></li>
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="LIFSTYLECusTomer" class="text-dark text-decoration-none">LIFESTYLE</a></li>
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="ISAACCusTomer" class="text-dark text-decoration-none">ISAAC</a></li>
+            </ul>
+
+
+            <!-- YOUNG -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><a asp-controller="ThoiTrangCustomerMVC" asp-action="YOUNGCusTomer" class="text-dark text-decoration-none">YOUNG</a></span>
+                <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+            </li>
+            <ul class="list-group list-group-flush submenu d-none ps-3">
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="BeTraiCusTomer" class="text-dark text-decoration-none">BÉ TRAI(7 - 14 tuổi)</a></li>
+                <li class="list-group-item"><a asp-controller="ThoiTrangCustomerMVC" asp-action="BeGaiCusTomer" class="text-dark text-decoration-none">BÉ GÁI(7 - 14 tuổi)</a></li>
+            </ul>
+
+
+            <!-- NAM -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><a asp-controller="NamCustomer" asp-action="DoNamCustomer" class="text-dark text-decoration-none">NAM</a></span>
+                <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+            </li>
+            <ul class="list-group list-group-flush submenu d-none ps-3">
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NamCustomer" asp-action="AoNam" class="text-dark text-decoration-none">ÁO</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="AoTShirtNam" class="text-dark text-decoration-none">Áo T-Shirt</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="AoPoLoNam" class="text-dark text-decoration-none">Áo Polo</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="AoGioNam" class="text-dark text-decoration-none">Áo Gió</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="AoDaiTayNam" class="text-dark text-decoration-none">Áo Dài Tay</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="AoLongVuNam" class="text-dark text-decoration-none">Áo Lông Vũ</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NamCustomer" asp-action="QuanNam" class="text-dark text-decoration-none">QUẦN</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="QuanShortNam" class="text-dark text-decoration-none">Quần Short</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="QuanGioNam" class="text-dark text-decoration-none">Quần Gió</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="QuanNiNam" class="text-dark text-decoration-none">Quần Nỉ</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NamCustomer" asp-action="GiayNam" class="text-dark text-decoration-none">GIÀY</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="GiayThoiTrangNam" class="text-dark text-decoration-none">Giày thời trang</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="GiayChayBoNam" class="text-dark text-decoration-none">Giày chạy bộ</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="GiayCauLongNam" class="text-dark text-decoration-none">Giày cầu lông</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="GiayBongRoNam" class="text-dark text-decoration-none">Giày bóng rổ</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="GiayBongDaNam" class="text-dark text-decoration-none">Giày bóng đá</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NamCustomer" asp-action="BoQuanAoNam" class="text-dark text-decoration-none">BỘ QUẦN ÁO</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="BoQuanAoBongRoNam" class="text-dark text-decoration-none">Bộ Quần Áo Bóng Rổ</a></li>
+                    <li class="list-group-item"><a asp-controller="NamCustomer" asp-action="BoQuanAoCauLongNam" class="text-dark text-decoration-none">Bộ Quần Áo Cầu Lông</a></li>
+                </ul>
+            </ul>
+
+
+            <!-- Nữ -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><a asp-controller="NuCustomer" asp-action="DoNuCustomer" class="text-dark text-decoration-none">NỮ</a></span>
+                <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+            </li>
+            <ul class="list-group list-group-flush submenu d-none ps-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NuCustomer" asp-action="AoNu" class="text-dark text-decoration-none">ÁO</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="AoTShirtNu" class="text-dark text-decoration-none">Áo T-Shirt</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="AoPoLoNu" class="text-dark text-decoration-none">Áo Polo</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="AoGioNu" class="text-dark text-decoration-none">Áo Gió</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="AoDaiTayNu" class="text-dark text-decoration-none">Áo Dài Tay</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="AoLongVuNu" class="text-dark text-decoration-none">Áo Lông Vũ</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NuCustomer" asp-action="QuanNu" class="text-dark text-decoration-none">QUẦN</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="QuanShortNu" class="text-dark text-decoration-none">Quần Short</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="QuanGioNu" class="text-dark text-decoration-none">Quần Gió</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="QuanNiNu" class="text-dark text-decoration-none">Quần Nỉ</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NuCustomer" asp-action="GiayNu" class="text-dark text-decoration-none">GIÀY</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="GiayThoiTrangNu" class="text-dark text-decoration-none">Giày thời trang</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="GiayChayBoNu" class="text-dark text-decoration-none">Giày chạy bộ</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="GiayCauLongNu" class="text-dark text-decoration-none">Giày cầu lông</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="GiayBongRoNu" class="text-dark text-decoration-none">Giày bóng rổ</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="GiayBongDaNu" class="text-dark text-decoration-none">Giày bóng đá</a></li>
+                </ul>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><a asp-controller="NuCustomer" asp-action="BoQuanAoNu" class="text-dark text-decoration-none">BỘ QUẦN ÁO</a></span>
+                    <button class="btn btn-sm toggle-submenu" type="button"><i class="bi bi-plus-lg"></i></button>
+                </li>
+                <ul class="list-group list-group-flush submenu d-none ps-3">
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="BoQuanAoBongRoNu" class="text-dark text-decoration-none">Bộ Quần Áo Bóng Rổ</a></li>
+                    <li class="list-group-item"><a asp-controller="NuCustomer" asp-action="BoQuanAoCauLongNu" class="text-dark text-decoration-none">Bộ Quần Áo Cầu Lông</a></li>
+                </ul>
+            </ul>
+
+    </div>
+</div>
+<!-- MOBILE SEARCH BAR -->
+<div id="mobileSearchBar" class="d-none">
+    <div class="d-flex align-items-center px-3 py-2 border-bottom">
+        <button class="btn p-0 border-0 bg-transparent me-2" id="closeSearchBtn">
+            <i class="bi bi-x fs-4"></i>
+        </button>
+        <input type="text" class="form-control border-0 shadow-none" placeholder="Bạn muốn tìm gì...">
+        <button class="btn p-0 border-0 bg-transparent ms-2">
+            <i class="bi bi-search fs-5"></i>
+        </button>
+    </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bottom-bar d-lg-none">
+    <a asp-action="Index" asp-controller="Home"><i class="bi bi-house"></i>Trang chủ</a>
+    <a asp-controller="TinTucCustomer" asp-action="Index"><i class="bi bi-lightning"></i>Ưu đãi</a>
+    <a asp-action="HeThongCuaHang" asp-controller="Footer"><i class="bi bi-geo-alt"></i>Cửa hàng</a>
+    <a href="https://www.facebook.com/profile.php?id=61578887938821"><i class="bi bi-chat-dots"></i>Nhắn tin</a>
+    <a asp-controller="Footer" asp-action="ThongTinLienHe"><i class="bi bi-telephone"></i>Hotline</a>
+</div>
+
+<!-- DESKTOP NAVBAR (giữ nguyên như bạn cung cấp) -->
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="d-flex justify-content-between align-items-center w-100 px-4">
+        <div class="navbar-left">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <img src="/css/Image/logoxoanen.png" alt="Li-Ning Logo" />
+            </a>
+            <ul class="navbar-nav align-items-center" id="navMenu">
+                <!-- THỂ THAO -->
+                <li class="nav-item dropdown">
+                    <a asp-controller="TheThaoCustomer" asp-action="TheThaoCustomer" class="nav-link dropdown-toggle" id="thethaoDropdown" role="button"
+                       aria-expanded="false">
+                        THỂ THAO
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown mt-0" aria-labelledby="thethaoDropdown">
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="PICKLEBALLCustomer">PICKLEBALL</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="ChayBoCustomer">CHẠY BỘ</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="TapLuyenCustomer">TẬP LUYỆN</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="BongRoCustomer">BÓNG RỔ</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="CauLongCustomer">CẦU LÔNG</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="BongDaCustomer">BÓNG ĐÁ</a></li>
+                        <li><a class="dropdown-item" asp-controller="TheThaoCustomer" asp-action="GolfCustomer">GOLF</a></li>
+                    </ul>
+                </li>
+                <!-- Thời Trang -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" asp-controller="ThoiTrangCustomerMVC" asp-action="ThoiTrangCusTomer" role="button">
+                        THỜI TRANG
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="thoitrangDropdown">
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="WADECusTomer">WADE</a></li>
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="BADFIVECusTomer">BADFIVE</a></li>
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="LIFESTYLECusTomer">LIFESTYLE</a></li>
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="ISAACCusTomer">ISAAC</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" asp-controller="ThoiTrangCustomerMVC" asp-action="YOUNGCusTomer" id="youngDropdown" role="button">
+                        YOUNG
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="youngDropdown">
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="BeTraiCusTomer">BÉ TRAI(7 - 14 tuổi)</a></li>
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="BeGaiCusTomer">BÉ GÁI(7 - 14 tuổi)</a></li>
+                    </ul>
+                </li>
+                <!-- NAM -->
+                <li class="nav-item dropdown position-static">
+                    <a class="nav-link dropdown-toggle" asp-controller="NamCustomer" asp-action="DoNamCustomer" id="dropdownNam" role="button">
+                        NAM
+                    </a>
+                    <div class="dropdown-menu mega-menu p-4" aria-labelledby="dropdownNam">
+                        <div class="row">
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoNam">Áo</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoTShirtNam">Áo T-Shirt</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoPoLoNam">Áo Polo</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoGioNam">Áo Gió</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoNiNam">Áo Nỉ</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoDaiTayNam">Áo Dài Tay</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="AoLongVuNam">Áo Lông Vũ</a>
+                            </div>
+
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NamCustomer" asp-action="QuanNam">QUẦN</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="QuanShortNam">Quần Short</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="QuanGioNam">Quần Gió</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="QuanNiNam">Quần Nỉ</a>
+                            </div>
+
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayNam">GIÀY</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayThoiTrangNam">Giày thời trang</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayChayBoNam">Giày chạy bộ</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayCauLongNam">Giày cầu lông</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayBongRoNam">Giày bóng rổ</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="GiayBongDaNam">Giày bóng đá</a>
+                            </div>
+
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NamCustomer" asp-action="BoQuanAoNam">BỘ QUẦN ÁO</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="BoQuanAoBongRoNam">Bộ Quần Áo Bóng Rổ</a>
+                                <a class="dropdown-item" asp-controller="NamCustomer" asp-action="BoQuanAoCauLongNam">Bộ Quần Áo Cầu Lông</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- NỮ (có thể tương tự, hoặc thay đổi nội dung tuỳ bạn) -->
+                <li class="nav-item dropdown position-static">
+                    <a class="nav-link dropdown-toggle" asp-controller="NuCustomer" asp-action="DoNuCustomer" id="nudropdownNam" role="button">
+                        Nữ
+                    </a>
+                    <div class="dropdown-menu mega-menu p-4" aria-labelledby="dropdownNu">
+                        <div class="row">
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoNu">Áo</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoTShirtNu">Áo T-Shirt</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoPoLoNu">Áo Polo</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoGioNu">Áo Gió</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoNiNu">Áo Nỉ</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoDaiTayNu">Áo Dài Tay</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="AoLongVuNu">Áo Lông Vũ</a>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NuCustomer" asp-action="QuanNu">QUẦN</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="QuanShortNu">Quần Short</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="QuanGioNu">Quần Gió</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="QuanNiNu">Quần Nỉ</a>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayNu">GIÀY</a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayThoiTrangNu">Giày thời trang</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayChayBoNu">Giày chạy bộ</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayCauLongNu">Giày cầu lông</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayBongRoNu">Giày bóng rổ</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="GiayBongDaNu">Giày bóng đá</a>
+                            </div>
+                            <div class="col-3">
+                                <h6 class="mega-title active">
+                                    <a class="dropdown-item" asp-controller="NuCustomer" asp-action="BoQuanAoNu">
+                                        BỘ QUẦN ÁO
+                                    </a>
+                                </h6>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="BoQuanAoBongRoNu">Bộ Quần Áo Bóng Rổ</a>
+                                <a class="dropdown-item" asp-controller="NuCustomer" asp-action="BoQuanAoCauLongNu">Bộ Quần Áo Cầu Lông</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                @* <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" asp-controller="ThoiTrangCustomerMVC" asp-action="OUTLETCusTomer" id="outletDropdown" role="button">
+                        OUTLET
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="outletDropdown">
+                        <li><a class="dropdown-item" asp-controller="ThoiTrangCustomerMVC" asp-action="OUTLETPICKLEBALLCusTomer">PICKLEBALL</a></li>
+                    </ul>
+                </li> *@
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Footer" asp-action="HeThongCuaHang">HỆ THỐNG CỬA HÀNG</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" asp-controller="TinTucCustomer" asp-action="Index" id="newstDropdown" role="button">
+                        TIN TỨC
+                    </a>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="navbar-right">
+            <!-- User -->
+            <li class="nav-item dropdown" style="list-style: none;>
+                <a class="nav-link" href="#" id="userDropdown" role="button" aria-expanded="false">
+                    <i class="bi bi-person"></i>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="userDropdown" style="list-style: none; padding-left: 0; margin: 0;">
+                    <li><a class="dropdown-item" asp-controller="LoginAccount" asp-action="SendOtppRegister">Đăng ký</a></li>
+                    <li><a class="dropdown-item" asp-controller="LoginAccount" asp-action="Login">Đăng nhập</a></li>
+                    <li><a class="dropdown-item" asp-controller="MoMoThanhtoancustomer" asp-action="Tracuudonhang">Tra cứu đơn hàng</a></li>
+                </ul>
+            </li>
+            <!-- Search -->
+            <div class="position-relative" id="searchArea">
+                <a class="nav-link" href="#" id="searchToggle">
+                    <i class="bi bi-search"></i>
+                </a>
+                <form method="get" asp-controller="SeachCustomer" asp-action="Index" id="searchBox" class="position-absolute end-0 mt-2 d-none search-container">
+                    <div class="input-group">
+                        <input type="text" name="keyword" class="form-control search-input" style="width: 200px;" placeholder="Tìm kiếm sản phẩm..." />
+
+                    </div>
+                </form>
+
+            </div>
+            <!-- Cart -->
+            <a class="nav-link position-relative" asp-action="CartCustomerIndex" asp-controller="CartCustomer">
+                <i class="bi bi-cart"></i>
+                <span class="badge rounded-pill bg-danger">@a</span>
+            </a>
+
+            <!-- Vietnam Flag -->
+            <img src="https://storage.googleapis.com/a1aa/image/56e5f5ab-6be3-40c2-8874-55cae8a577e0.jpg" alt="Vietnam flag with red background and yellow star" class="flag" />
+        </div>
+    </div>
+</nav>
+

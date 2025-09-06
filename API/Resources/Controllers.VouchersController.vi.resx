@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="CodeAlreadyExists" xml:space="preserve">
+    <value>Mã voucher đã tồn tại.</value>
+  </data>
+  <data name="VoucherNotFound" xml:space="preserve">
+    <value>Không tìm thấy voucher.</value>
+  </data>
+  <data name="StartDateMustBeLessThanEndDate" xml:space="preserve">
+    <value>Ngày bắt đầu phải nhỏ hơn ngày kết thúc.</value>
+  </data>
+  <data name="EndDateMustBeFuture" xml:space="preserve">
+    <value>Ngày kết thúc phải nằm trong tương lai.</value>
+  </data>
+  <data name="StartDateCannotBePast" xml:space="preserve">
+    <value>Ngày bắt đầu không được nhỏ hơn ngày hiện tại.</value>
+  </data>
+  <data name="InvalidDiscountType" xml:space="preserve">
+    <value>Loại giảm giá không hợp lệ.</value>
+  </data>
+  <data name="InvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ.</value>
+  </data>
+  <data name="DiscountValuePercentRange" xml:space="preserve">
+    <value>Giá trị phần trăm giảm giá phải trong khoảng từ 0 đến 100.</value>
+  </data>
+  <data name="OnlyOneImageAllowed" xml:space="preserve">
+    <value>Chỉ được chọn 1 trong 2: file ảnh hoặc link ảnh.</value>
+  </data>
+  <data name="CodeCannotBeEmpty" xml:space="preserve">
+    <value>Mã voucher không được để trống.</value>
+  </data>
+  <data name="DescriptionCannotBeEmpty" xml:space="preserve">
+    <value>Mô tả không được để trống.</value>
+  </data>
+  <data name="DiscountValueMustBePositive" xml:space="preserve">
+    <value>Giá trị giảm giá phải lớn hơn 0.</value>
+  </data>
+  <data name="MinOrderAmountCannotBeNegative" xml:space="preserve">
+    <value>Giá trị đơn hàng tối thiểu không được âm.</value>
+  </data>
+  <data name="InvalidImage" xml:space="preserve">
+    <value>Ảnh không hợp lệ.</value>
+  </data>
+</root>

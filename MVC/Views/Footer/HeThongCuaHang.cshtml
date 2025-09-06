@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewData["Title"] = "HeThongCuaHang";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+    <link rel="stylesheet" href="~/css/CSS/Hethongcuahang.css" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active current" aria-current="page">Hệ thống của hàng</li>
+    </ol>
+</nav>
+
+<section class="page-title">
+    <h1>HỆ THỐNG CỬA HÀNG</h1>
+</section>
+
+
+<!-- Main content -->
+<main class="container my-4" style="max-width:1200px;">
+    <div class="row border rounded shadow-sm overflow-hidden" style="border-color:#d9bdbd;">
+        <!-- Store list -->
+        <div class="col-md-4 border-end" style="border-color:#d9bdbd;">
+            <div class="store-list">
+                <div class="store-item active"
+                     data-map-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.927927927927!2d105.8412343153163!3d21.011234792569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9f1a2b3b3b%3A0x123456789abcdef!2sLi-Ning%20Vincom%20Times%20City!5e0!3m2!1sen!2s!4v1698192000000!5m2!1sen!2s">
+                    <h3>StyleZone TTTM Time City</h3>
+                    <p>Gian hàng số TD-15, TTTM Vincom Times City, Vĩnh Tuy, Hai Bà Trưng, Hà Nội.</p>
+                    <p>SĐT/Zalo :0344046211</p>
+                </div>
+                <div class="store-item"
+                     data-map-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.927927927927!2d105.8100000!3d20.9950000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab8f1a2b3b3b%3A0xabcdef123456789!2sLi-Ning%20Vincom%20Royal%20City!5e0!3m2!1sen!2s!4v1698193000000!5m2!1sen!2s">
+                    <h3>StyleZone TTTM Royal City</h3>
+                    <p>
+                        Gian hàng số B2-R4-01, TTTM Vincom Royal City, 72A Nguyễn Trãi, phường Thượng Đình, quận
+                        Thanh Xuân, Hà Nội.
+                    </p>
+                    <p>SĐT/Zalo :0392308912</p>
+                </div>
+                <div class="store-item"
+                     data-map-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.927927927927!2d105.8800000!3d21.0500000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab7f1a2b3b3b%3A0x789abcdef123456!2sLi-Ning%20Tasco%20Mall!5e0!3m2!1sen!2s!4v1698194000000!5m2!1sen!2s">
+                    <h3>StyleZone Tasco Mall</h3>
+                    <p>
+                        Gian hàng số 101 -102 tầng 1, TTTM Tasco Mall, số 7-9 đường Nguyễn Văn Linh, Quận Long
+                        Biên,
+                        Hà Nội.
+                    </p>
+                    <p>SĐT/Zalo :0393013530</p>
+                </div>
+            </div>
+        </div>
+        <!-- Map -->
+        <div class="col-md-8 p-0">
+            <iframe id="mapFrame"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.927927927927!2d105.8412343153163!3d21.011234792569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9f1a2b3b3b%3A0x123456789abcdef!2sLi-Ning%20Vincom%20Times%20City!5e0!3m2!1sen!2s!4v1698192000000!5m2!1sen!2s"
+                    width="100%" height="420" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Google Maps showing Li-Ning Vincom Times City location"></iframe>
+        </div>
+    </div>
+</main>
+
+<script>
+    const storeItems = document.querySelectorAll(".store-item");
+    const mapFrame = document.getElementById("mapFrame");
+
+    storeItems.forEach((item) => {
+        item.addEventListener("click", () => {
+            // Remove active class from all
+            storeItems.forEach((i) => i.classList.remove("active"));
+            // Add active class to clicked
+            item.classList.add("active");
+            // Update iframe src
+            const newSrc = item.getAttribute("data-map-src");
+            if (newSrc) {
+                mapFrame.src = newSrc;
+            }
+        });
+    });
+</script>
+

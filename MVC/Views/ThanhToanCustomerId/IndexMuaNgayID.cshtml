@@ -1,0 +1,808 @@
+﻿@using API.DomainCusTomer.DTOs.MuaNgayCustomerID
+@model MuangaycustomerIdDto
+@{
+    ViewData["Title"] = "IndexMuaNgayID";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+    var defaultAddress = Model?.AddressList?.FirstOrDefault(a => a.Stastus == "Mặc định");
+    decimal tongTienHang = Model.Price * Model.Quantity;
+    decimal phiVanChuyen = 0;
+    decimal tongThanhToan = tongTienHang + phiVanChuyen;
+}
+
+<link href="~/css/CSS/ThanhToanCustomerId.css" rel="stylesheet" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Thanh Toán</li>
+    </ol>
+</nav>
+
+<!-- Modal chọn địa chỉ -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content rounded-3 shadow">
+
+            <!-- Header -->
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold" id="addressModalLabel">
+                    <i class="fas fa-map-marker-alt text-danger me-2"></i>Địa Chỉ Của Tôi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-3">
+                @foreach (var a in Model.AddressList)
+                {
+                    <div class="border rounded-3 p-3 mb-3 address-item @(a.Stastus == "Mặc định" ? "border-danger bg-light" : "border-light")">
+                        <div class="d-flex align-items-start gap-3">
+
+                            <!-- Badge trạng thái -->
+                            <div class="text-nowrap">
+                                @if (a.Stastus == "Mặc định")
+                                {
+                                    <span class="badge bg-danger">Mặc định</span>
+                                }
+                                else
+                                {
+                                    <form asp-action="UpdateStatusDiaChiMuaNgay" asp-controller="CartCustomerID" asp-route-id="@a.Id" method="post" class="m-0">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Thiết lập</button>
+                                    </form>
+                                }
+                            </div>
+
+                            <!-- Thông tin địa chỉ -->
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>@a.FullName</strong>
+                                        <span class="text-secondary ms-2">@a.PhoneNumber</span>
+                                    </div>
+
+                                    <!-- Nút cập nhật -->
+                                    <a href="javascript:void(0)"
+                                       class="text-decoration-none text-primary small"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#updateAddressModal"
+                                       data-id="@a.Id"
+                                       data-fullname="@a.FullName"
+                                       data-phonenumber="@a.PhoneNumber"
+                                       data-detailaddress="@a.DetailAddress"
+                                       data-province="@a.Province"
+                                       data-district="@a.District"
+                                       data-ward="@a.Ward">
+                                        <i class="fas fa-edit me-1"></i>Cập nhật
+                                    </a>
+                                </div>
+
+                                <!-- Địa chỉ chi tiết -->
+                                <div class="text-secondary small mt-1">
+                                    @a.DetailAddress, @a.Ward, @a.District, @a.Province
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Nút thêm địa chỉ -->
+                <button class="btn btn-outline-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                    <i class="fas fa-plus me-1"></i> Thêm Địa Chỉ Mới
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm địa chỉ mới -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Thông tin giao hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="formAddAddress" asp-action="ThemDiaChiMuaNgay" asp-controller="CartCustomerID" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" name="FullName" class="form-control form-control-sm" placeholder="Họ và tên" required />
+                    </div>
+                    <div class="mb-3">
+                        <input type="tel" name="PhoneNumber" class="form-control form-control-sm" placeholder="Số điện thoại" pattern="^0\d{9}$" required />
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="ProvinceSelect" required></select>
+                        </div>
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="DistrictSelect" required disabled></select>
+                        </div>
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="WardSelect" required disabled></select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="Province" id="Province" />
+                    <input type="hidden" name="District" id="District" />
+                    <input type="hidden" name="Ward" id="Ward" />
+                    <div class="mb-3">
+                        <input type="text" name="DetailAddress" class="form-control form-control-sm" placeholder="Địa chỉ (số nhà, tên đường)" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cập nhật địa chỉ -->
+<div class="modal fade" id="updateAddressModal" tabindex="-1" aria-labelledby="updateAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateAddressModalLabel">Cập nhật địa chỉ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="formUpdateAddress" asp-action="UpdateDiaChiMuaNgay" asp-controller="CartCustomerID" method="post">
+                <input type="hidden" name="Id" id="updateId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" name="FullName" class="form-control form-control-sm" id="updateFullName" required />
+                    </div>
+                    <div class="mb-3">
+                        <input type="tel" name="PhoneNumber" class="form-control form-control-sm" id="updatePhoneNumber" pattern="^0\d{9}$" required />
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="updateProvinceSelect" required></select>
+                        </div>
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="updateDistrictSelect" required disabled></select>
+                        </div>
+                        <div class="col-4">
+                            <select class="form-select form-select-sm" id="updateWardSelect" required disabled></select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="Province" id="updateProvince" />
+                    <input type="hidden" name="District" id="updateDistrict" />
+                    <input type="hidden" name="Ward" id="updateWard" />
+                    <div class="mb-3">
+                        <input type="text" name="DetailAddress" class="form-control form-control-sm" id="updateAddress" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Voucher -->
+<div class="modal fade" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="voucherModalLabel">Chọn Voucher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                @*
+                <!-- Input tìm kiếm -->
+                <div class="mb-3">
+                <input type="text" id="voucherSearch" class="form-control" placeholder="Nhập mã voucher...">
+                </div> *@
+
+                <!-- Danh sách voucher -->
+                <div class="list-group" id="voucherList">
+                    @foreach (var a in Model.VoucherList)
+                    {
+                        <label class="list-group-item d-flex align-items-center gap-3">
+                            <input type="radio"
+                                   name="voucher"
+                                   class="form-check-input mt-0"
+                                   data-id="@(a.Id)"
+                                   data-discounttype="@((int)a.DiscountType)"
+                                   data-discountvalue="@(a.DiscountValue)"
+                                   data-minorder="@(a.MinOrderAmount ?? 0)"
+                                   value="@a.Code" />
+
+                            <div>
+                                <div class="fw-bold">@a.Code - @a.Description</div>
+                                <small class="text-secondary">
+                                    Đơn tối thiểu @((a.MinOrderAmount ?? 0).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))
+                                    | HSD: @a.EndDate.ToString("dd/MM/yyyy")
+                                </small>
+                            </div>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở lại</button>
+                <button type="button" class="btn btn-primary" id="applyVoucher">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (TempData["MessageDiaChimuangay"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["MessageDiaChimuangay"]
+    </div>
+
+}
+
+@if (TempData["ErroaccountId"] != null)
+{
+    <script>
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: '@Html.Raw(TempData["ErroaccountId"])',
+            showConfirmButton: false,
+            timer: 6000,
+            timerProgressBar: true,
+            background: '#d4edda', // nền xanh nhạt
+            color: '#155724',      // chữ xanh đậm
+            customClass: {
+                popup: 'animated tada faster'
+            }
+        });
+    </script>
+}
+
+<form asp-action="CreateOrderCustomerId" asp-controller="MoMoThanhtoanCustomerId" class="row g-3 flex-column flex-lg-row-reverse" method="post">
+    <div class="container py-4" style="max-width: 850px;">
+        @if (TempData["MessageDiaChi"] != null)
+        {
+            <div class="alert alert-danger" id="errorMessage">
+                @TempData["MessageDiaChi"]
+            </div>
+        }
+
+        @if (TempData["ErroaccountId"] != null)
+        {
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: '@Html.Raw(TempData["ErroaccountId"])',
+                    showConfirmButton: false,
+                    timer: 6000,
+                    timerProgressBar: true,
+                    background: '#d4edda', // nền xanh nhạt
+                    color: '#155724',      // chữ xanh đậm
+                    customClass: {
+                        popup: 'animated tada faster'
+                    }
+                });
+            </script>
+        }
+
+        <!-- Địa chỉ -->
+        <div class="card-custom mb-3">
+            <div class="d-flex align-items-center text-red-custom fw-semibold mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>Địa Chỉ Nhận Hàng</span>
+            </div>
+            <div class="card-custom mb-3">
+                <div class="d-flex align-items-center text-red-custom fw-semibold mb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    <span>Địa Chỉ Nhận Hàng</span>
+                </div>
+                <div id="selectedAddressDisplay" class="d-flex flex-wrap align-items-center gap-2 text-secondary">
+                    <span class="fw-semibold">@defaultAddress?.FullName @defaultAddress?.PhoneNumber</span>
+
+                    <span>@defaultAddress?.DetailAddress, @defaultAddress?.Ward, @defaultAddress?.District, @defaultAddress?.Province</span>
+
+                    <input type="hidden" id="detailAddress" value="@defaultAddress?.DetailAddress" />
+                    <input type="hidden" id="provinceName" value="@defaultAddress?.Province" />
+                    <input type="hidden" id="districtName" value="@defaultAddress?.District" />
+                    <input type="hidden" id="wardName" value="@defaultAddress?.Ward" />
+
+
+                    <input type="hidden" name="Province" value="@defaultAddress?.Province" id="Province" />
+                    <input type="hidden" name="District" value="@defaultAddress?.District" id="District" />
+                    <input type="hidden" name="Ward" value="@defaultAddress?.District" id="Ward" />
+
+                    <input type="hidden" id="address" name="Address" value="@defaultAddress?.DetailAddress" />
+                    <input type="hidden" id="fullName" name="FullName" value="@defaultAddress?.FullName" />
+                    <input type="hidden" id="phoneNumber" name="PhoneNumber" value="@defaultAddress?.PhoneNumber" />
+                    <button type="button" class="underline-link" data-bs-toggle="modal" data-bs-target="#addressModal">
+                        Thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sản phẩm -->
+        <div class="card-custom mb-3">
+            <div class="shop-header d-flex align-items-center justify-content-between text-secondary fw-semibold">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span class="text-success">• Chất lượng</span>
+                </div>
+            </div>
+
+            <!-- Bảng cho desktop -->
+            <table class="table product-table">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Số lượng</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="@($"https://localhost:7257/{(Model.ImageUrl ?? "default1.jpg")}")" alt="@Model.Name"
+                                     class="rounded img-fluid me-3 d-block d-sm-inline"
+                                     style="width: 70px; height: 70px; object-fit: cover;">
+                                <span class="product-name">@Model.Name <hr />Color: @Model.ColorName | Size: @Model.SizeName </span>
+                            </div>
+                        </td>
+                        <td class="product-price">@Model.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</td>
+                        <td class="product-price">@Model.Quantity</td>
+                        <td class="product-price fw-semibold text-danger">  @((Model.Price * Model.Quantity).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Dạng thẻ cho mobile -->
+            <div class="product-card">
+                <img src="@($"https://localhost:7257/{(Model.ImageUrl ?? "default1.jpg")}")" alt="Sản phẩm">
+                <div class="product-info">
+                    <div class="name">@Model.Name <hr />Color: @Model.ColorName | Size: @Model.SizeName</div>
+                    <div class="product-meta"> @Model.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN")) x @Model.Quantity</div>
+                </div>
+                <div class="product-total">  @((Model.Price * Model.Quantity).ToString("C0", new System.Globalization.CultureInfo("vi-VN")))</div>
+            </div>
+        </div>
+
+        <!-- Ghi chú -->
+        <div class="card-custom mb-3 text-secondary">
+            <label for="orderNote" class="form-label fw-semibold">
+                <i class="fas fa-pencil-alt me-2"></i>Ghi chú cho đơn hàng
+            </label>
+            <input type="text" id="orderNote" name="GhiChu"
+                   class="form-control" placeholder="Nhập ghi chú (ví dụ: Giao giờ hành chính)" />
+        </div>
+
+        <!-- Voucher -->
+        <div class="card-custom mb-3 d-flex justify-content-between align-items-center text-secondary">
+            <span><i class="fas fa-ticket-alt text-warning me-2"></i>StyleZone Voucher</span>
+            <button type="button" class="underline-link btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#voucherModal">
+                Chọn Voucher
+            </button>
+            <input type="hidden" id="SelectedVoucherId" name="VorcherId" value="" />
+        </div>
+
+        <!-- addbill -->
+        <input type="hidden" name="OrderItems[0].ProductDetailId" value="@Model.ProductDetailId" />
+        <input type="hidden" name="OrderItems[0].Quantity" value="@Model.Quantity" />
+        <input type="hidden" name="OrderItems[0].Price" value="@Model.Price" />
+        <input type="hidden" name="IsFromCart" value="false" />
+
+
+
+
+        <!-- addbill -->
+        <!-- Thanh toán -->
+        <div class="card-custom mb-3">
+            <h2 class="h6 fw-semibold mb-3">Phương thức thanh toán</h2>
+            <div class="vstack gap-2 mb-3">
+                <label class="form-check d-flex align-items-center rounded p-2">
+                    <input type="radio" name="PaymentMethodCode" class="form-check-input me-2" value="cod" checked />
+                    <span class="flex-grow-1">Thanh toán khi nhận hàng (COD)</span>
+                    <i class="fas fa-truck text-muted"></i>
+                </label>
+                <label class="form-check d-flex align-items-center rounded p-2">
+                    <input type="radio" name="PaymentMethodCode" class="form-check-input me-2" value="momo" />
+                    <span class="flex-grow-1">Ví điện tử Momo</span>
+                    <img src="@Url.Content("~/css/Image/momo.png")" alt="Momo" style="height: 45px;" />
+                </label>
+            </div>
+        </div>
+
+        <!-- Tổng cộng -->
+        <div class="d-flex justify-content-between">
+            <span>Tổng tiền hàng</span>
+            <span id="tongTienHang" data-value="@tongTienHang">
+                @tongTienHang.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+            </span>
+        </div>
+        <div class="d-flex justify-content-between">
+            @if (defaultAddress != null &&
+                        !string.IsNullOrEmpty(defaultAddress.DetailAddress) &&
+                        !string.IsNullOrEmpty(defaultAddress.Ward) &&
+                        !string.IsNullOrEmpty(defaultAddress.District) &&
+                        !string.IsNullOrEmpty(defaultAddress.Province))
+            {
+                <span>Phí vận chuyển</span>
+                <span id="phiVanChuyen" data-value="@phiVanChuyen">
+                    @phiVanChuyen.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                </span>
+                <input type="hidden" name="ShippingFee" id="ShippingFee" value="@phiVanChuyen" />
+            }
+            else
+            {
+                <span>Phí vận chuyển</span>
+                <span id="" data-value="">
+                    0đ
+                </span>
+
+            }
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Giảm giá: </span>
+            <span id="discountAmount" data-value="0">0₫</span>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between price-total">
+            <span>Tổng thanh toán</span>
+            <span id="tongThanhToan">
+                @tongThanhToan.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+            </span>
+            <input type="hidden" name="TotalAmount" id="TotalAmount" value="@tongThanhToan.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))" />
+        </div>
+        <hr>
+        <button type="submit" id="btnCompleteOrder" class="btn btn-red w-100 py-3 fw-semibold">Đặt hàng</button>
+
+    </div>
+</form>
+@section Scripts {
+    <script>
+        // ----------------- Xử lý nút Hoàn tất đơn hàng -----------------
+        document.getElementById("btnCompleteOrder").addEventListener("click", async function (e) {
+            e.preventDefault();
+
+            const paymentMethod = document.querySelector("input[name='PaymentMethodCode']:checked");
+            if (!paymentMethod) {
+                alert("Vui lòng chọn phương thức thanh toán.");
+                return;
+            }
+
+            const fullName = document.getElementById("fullName").value.trim();
+            if (!fullName) {
+                alert("Vui lòng nhập họ và tên.");
+                return;
+            }
+
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const amount = parseInt(document.getElementById("TotalAmount").value, 10);
+            const vorcherid = document.getElementById('SelectedVoucherId');
+            const Note = document.getElementById('orderNote');
+
+            const orderData = {
+                FullName: fullName,
+                PhoneNumber: phoneNumber,
+                Address: address,
+                GhiChu: Note,
+                VorcherId: vorcherid,
+                ProductDetailId: @Model.ProductDetailId,
+                Quantity: @Model.Quantity,
+                PaymentMethodCode: paymentMethod.value,
+                TotalAmount: amount,
+                IsFromCart: false
+            };
+
+            try {
+                // Gửi yêu cầu tạo đơn hàng
+                await fetch("/MoMoThanhtoanCustomerId/CreateOrderCustomerId", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(orderData)
+                });
+
+
+            } catch (error) {
+                console.error("Lỗi xử lý đơn hàng:", error);
+                alert("Đã xảy ra lỗi khi gửi đơn hàng.");
+            }
+        });
+
+    </script>
+    <script>
+            const apiLocalGHN = "https://localhost:7257/api/GHN/";
+
+            async function ghnGet(endpoint) {
+                const res = await fetch(apiLocalGHN + endpoint);
+                return res.ok ? res.json() : [];
+            }
+
+            async function ghnPost(endpoint, body) {
+                const res = await fetch(apiLocalGHN + endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+                return res.ok ? res.json() : [];
+            }
+
+            async function setupLocationDropdowns(prefix) {
+                const provinceEl = document.getElementById(`${prefix}ProvinceSelect`);
+                const districtEl = document.getElementById(`${prefix}DistrictSelect`);
+                const wardEl = document.getElementById(`${prefix}WardSelect`);
+                const provinceHidden = document.getElementById(`${prefix}Province`);
+                const districtHidden = document.getElementById(`${prefix}District`);
+                const wardHidden = document.getElementById(`${prefix}Ward`);
+
+                const provinces = await ghnGet("provinces");
+                provinceEl.innerHTML = '<option value="">Tỉnh / thành</option>';
+                provinces.forEach(p => {
+                    provinceEl.innerHTML += `<option value="${p.ProvinceID}">${p.ProvinceName}</option>`;
+                });
+
+                provinceEl.addEventListener("change", async () => {
+                    const provinceID = provinceEl.value;
+                    if (!provinceID) return;
+
+                    const districts = await ghnPost("districts", { province_id: parseInt(provinceID) });
+                    districtEl.innerHTML = '<option value="">Quận / huyện</option>';
+                    districts.forEach(d => {
+                        districtEl.innerHTML += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+                    });
+
+                    districtEl.disabled = false;
+                    provinceHidden.value = provinceEl.options[provinceEl.selectedIndex].text;
+                });
+
+                districtEl.addEventListener("change", async () => {
+                    const districtID = districtEl.value;
+                    if (!districtID) return;
+
+                    const wards = await ghnPost("wards", { district_id: parseInt(districtID) });
+                    wardEl.innerHTML = '<option value="">Phường / xã</option>';
+                    wards.forEach(w => {
+                        wardEl.innerHTML += `<option value="${w.WardCode}">${w.WardName}</option>`;
+                    });
+
+                    wardEl.disabled = false;
+                    districtHidden.value = districtEl.options[districtEl.selectedIndex].text;
+                });
+
+                wardEl.addEventListener("change", () => {
+                    wardHidden.value = wardEl.options[wardEl.selectedIndex].text;
+                });
+            }
+
+            // Khi mở modal thêm địa chỉ mới
+            document.getElementById('addAddressModal').addEventListener('show.bs.modal', async () => {
+                await setupLocationDropdowns("");
+            });
+
+            // Khi mở modal cập nhật
+            document.getElementById('updateAddressModal').addEventListener('show.bs.modal', async function (event) {
+                const btn = event.relatedTarget;
+                const id = btn.getAttribute("data-id");
+                const fullname = btn.getAttribute("data-fullname");
+                const phone = btn.getAttribute("data-phonenumber");
+                const address = btn.getAttribute("data-detailaddress");
+                const provinceName = btn.getAttribute("data-province");
+                const districtName = btn.getAttribute("data-district");
+                const wardName = btn.getAttribute("data-ward");
+
+                document.getElementById("updateId").value = id;
+                document.getElementById("updateFullName").value = fullname;
+                document.getElementById("updatePhoneNumber").value = phone;
+                document.getElementById("updateAddress").value = address;
+
+                await setupLocationDropdowns("update");
+
+                const provinceEl = document.getElementById("updateProvinceSelect");
+                const districtEl = document.getElementById("updateDistrictSelect");
+                const wardEl = document.getElementById("updateWardSelect");
+
+                const provinceOption = [...provinceEl.options].find(opt => opt.text === provinceName);
+                if (provinceOption) {
+                    provinceEl.value = provinceOption.value;
+                    document.getElementById("updateProvince").value = provinceOption.text;
+
+                    const districts = await ghnPost("districts", { province_id: parseInt(provinceOption.value) });
+                    districtEl.innerHTML = '<option value="">Quận / huyện</option>';
+                    districts.forEach(d => {
+                        districtEl.innerHTML += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+                    });
+                    districtEl.disabled = false;
+
+                    const districtOption = [...districtEl.options].find(opt => opt.text === districtName);
+                    if (districtOption) {
+                        districtEl.value = districtOption.value;
+                        document.getElementById("updateDistrict").value = districtOption.text;
+
+                        const wards = await ghnPost("wards", { district_id: parseInt(districtOption.value) });
+                        wardEl.innerHTML = '<option value="">Phường / xã</option>';
+                        wards.forEach(w => {
+                            wardEl.innerHTML += `<option value="${w.WardCode}">${w.WardName}</option>`;
+                        });
+                        wardEl.disabled = false;
+
+                        const wardOption = [...wardEl.options].find(opt => opt.text === wardName);
+                        if (wardOption) {
+                            wardEl.value = wardOption.value;
+                            document.getElementById("updateWard").value = wardOption.text;
+                        }
+                    }
+                }
+            });
+
+
+        const tongTienHangEl = document.getElementById("tongTienHang");
+        const phiVanChuyenEl = document.getElementById("phiVanChuyen");
+        const tongThanhToanEl = document.getElementById("tongThanhToan");
+
+        const provinceName = document.getElementById("provinceName").value || "";
+        const districtName = document.getElementById("districtName").value || "";
+        const wardName = document.getElementById("wardName").value || "";
+
+        // Lấy giá trị gốc từ data-value (đã là số nguyên)
+        const subTotal = parseInt(tongTienHangEl.dataset.value, 10);
+        let serviceId = 53320;
+
+        // Bỏ dấu + thường hóa
+        function normalize(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        }
+
+        // API GET
+        async function ghnGet(endpoint) {
+            const res = await fetch(apiLocalGHN + endpoint);
+            if (!res.ok) throw new Error(`API GET ${endpoint} lỗi`);
+            return await res.json();
+        }
+
+        // API POST
+        async function ghnPost(endpoint, body) {
+            const res = await fetch(apiLocalGHN + endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error(`API POST ${endpoint} lỗi`);
+            return await res.json();
+        }
+
+        // Lấy ID tỉnh/huyện/xã từ tên
+        async function getIdsFromNames() {
+            const provinces = await ghnGet("provinces");
+            const province = provinces.find(p => normalize(p.ProvinceName).includes(normalize(provinceName)));
+            if (!province) throw new Error("Không tìm thấy tỉnh");
+
+            const districts = await ghnPost("districts", { province_id: province.ProvinceID });
+            const district = districts.find(d => normalize(d.DistrictName).includes(normalize(districtName)));
+            if (!district) throw new Error("Không tìm thấy huyện");
+
+            const wards = await ghnPost("wards", { district_id: district.DistrictID });
+            const ward = wards.find(w => normalize(w.WardName).includes(normalize(wardName)));
+            if (!ward) throw new Error("Không tìm thấy xã");
+
+            return { districtId: district.DistrictID, wardCode: ward.WardCode };
+        }
+
+        // Tính phí ship
+        async function calculateShipping() {
+            try {
+                const { districtId, wardCode } = await getIdsFromNames();
+
+                const body = {
+                    service_id: serviceId,
+                    insurance_value: subTotal,
+                    from_district_id: 1482, // mã huyện kho gửi
+                    to_district_id: districtId,
+                    to_ward_code: wardCode,
+                    height: 5,
+                    length: 30,
+                    weight: 300,
+                    width: 25
+                };
+
+                const result = await ghnPost("calculate-fee", body);
+
+                if (result.total_fee !== undefined) {
+                    const shippingFee = result.total_fee;
+                    const totalAmount = subTotal + shippingFee;
+
+                    // Cập nhật UI
+                    phiVanChuyenEl.dataset.value = shippingFee;
+                    phiVanChuyenEl.textContent = shippingFee.toLocaleString('vi-VN') + "₫";
+
+                    tongThanhToanEl.dataset.value = totalAmount;
+                    tongThanhToanEl.textContent = totalAmount.toLocaleString('vi-VN') + "₫";
+
+                     // Gán vào input hidden
+                        document.getElementById("ShippingFee").value = shippingFee;
+                         document.getElementById('TotalAmount').value = totalAmount;
+                     
+
+                    console.log("Phí ship:", shippingFee, "Tổng thanh toán:", totalAmount);
+                } else {
+                    console.error("Không tính được phí ship:", result);
+                }
+            } catch (err) {
+                console.error("Lỗi tính phí ship:", err);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", calculateShipping);
+
+
+    </script>
+    <script>
+        // Áp dụng voucher khi click nút
+        document.getElementById('applyVoucher').addEventListener('click', function () {
+            const selectedVoucher = document.querySelector('input[name="voucher"]:checked');
+            if (!selectedVoucher) {
+                alert('Vui lòng chọn voucher');
+                return;
+            }
+
+            const discountType = parseInt(selectedVoucher.dataset.discounttype);
+            let discountValueRaw = parseFloat(selectedVoucher.dataset.discountvalue) || 0;
+            const minOrder = parseFloat(selectedVoucher.dataset.minorder) || 0;
+            const tongTienHang = parseFloat(document.getElementById('tongTienHang')?.dataset?.value) || 0;
+            const phiVanChuyen = parseFloat(document.getElementById('phiVanChuyen')?.dataset?.value) || 0;
+
+            // Kiểm tra xem đơn hàng có đạt mức tối thiểu không
+            if (tongTienHang < minOrder) {
+                alert('Đơn hàng chưa đạt mức tối thiểu để áp dụng voucher này.');
+                return;
+            }
+
+            let discountAmount = 0;
+            // Tính toán số tiền giảm giá
+            if (discountType === 1) {
+                let percent = discountValueRaw;
+                if (percent > 1) percent = percent / 100; 
+                discountAmount = tongTienHang * percent;
+            } else {
+                discountAmount = discountValueRaw;
+            }
+
+            if (discountAmount > tongTienHang) discountAmount = tongTienHang;
+            discountAmount = Math.round(discountAmount);
+
+            // Cập nhật hiển thị số tiền giảm giá và tổng thanh toán
+            document.getElementById('discountAmount').innerText =
+                discountAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            document.getElementById('discountAmount').dataset.value = discountAmount;
+
+            const tongThanhToan = Math.round(tongTienHang - discountAmount + phiVanChuyen);
+            document.getElementById('tongThanhToan').innerText =
+                tongThanhToan.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
+            document.getElementById('TotalAmount').value = tongThanhToan;
+
+            // Gán voucher ID vào hidden input
+            document.getElementById('SelectedVoucherId').value = selectedVoucher.dataset.id; // Cập nhật ID voucher
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('voucherModal'));
+            if (modal) modal.hide(); // Đóng modal
+        });
+
+        // Luôn đồng bộ voucher khi submit form
+        document.querySelector('form').addEventListener('submit', function () {
+            const selectedVoucher = document.querySelector('input[name="voucher"]:checked');
+            document.getElementById('SelectedVoucherId').value = selectedVoucher ? selectedVoucher.value : "";
+        });
+    </script>
+
+}

@@ -1,0 +1,224 @@
+﻿@model IEnumerable<API.Domain.DTOs.PromotionDto>
+
+@{
+    ViewData["Title"] = "Danh sách khuyến mãi";
+    string defaultImage = "/images/no-image.png";
+}
+
+@section Styles {
+    <style>
+        .table td, .table th {
+            max-width: 120px;
+            word-break: break-word;
+            white-space: normal;
+        }
+        .dropdown-menu form {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2>Danh sách khuyến mãi</h2>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <form asp-action="BulkChangeStatus" method="post" id="bulkActionForm">
+            <div id="bulkActionBar" class="bg-light border-top p-3 d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                <div id="selectedCount">Đã chọn <strong>0</strong> khuyến mãi</div>
+                <input type="hidden" name="status" id="bulkStatus" />
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="submitBulkStatus('Active')">Áp dụng</button>
+                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="submitBulkStatus('Inactive')">Chưa áp dụng</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="submitBulkStatus('Expired')">Ngừng áp dụng</button>
+                </div>
+            </div>
+            <div id="selectedIdsContainer"></div>
+        </form>
+
+        <!-- Table -->
+        <div class="card-style mb-30">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <a asp-action="Create" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Tạo khuyến mãi
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                                <a class="text-primary fw-medium" role="button" asp-action="Export">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div>
+            </div>
+            <div class="table-wrapper table-responsive">
+                <table id="promotionTable" class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)" /></th>
+                            <th>Ảnh</th>
+                            <th>Tên chương trình</th>
+                            <th>Loại giảm giá</th>
+                            <th>Giá trị</th>
+                            <th>Số lượng sản phẩm</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var promo in Model)
+                        {
+                            <tr>
+                                <td><input type="checkbox" class="rowCheckbox" value="@promo.Id" onclick="updateSelected()" /></td>
+                                <td>
+                                    <img src="@(string.IsNullOrEmpty(promo.ImageUrl) ? defaultImage : "https://localhost:7257" + promo.ImageUrl)" width="50" height="50" style="object-fit: cover;" />
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@promo.Id" class="text-decoration-none text-dark">
+                                        <div class="fw-semibold text-primary">@promo.Name</div>
+                                        <div class="text-muted small">@promo.Description</div>
+                                    </a>
+                                </td>
+                                <td>@(promo.DiscountType == "Percentage" ? "Phần trăm" : "Giá cố định")</td>
+                                <td>
+                                    @promo.DiscountValue.ToString("0.##") @(promo.DiscountType == "Percentage" ? "%" : "₫")
+                                </td>
+
+                                <td>@promo.ProductCount</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="badge px-3 py-1 rounded-pill text-decoration-none dropdown-toggle @(promo.Status switch {
+                                                "Active" => "bg-success-subtle text-success",
+                                                "Inactive" => "bg-warning-subtle text-warning",
+                                                "Expired" => "bg-danger-subtle text-danger",
+                                                _ => "bg-light text-dark"
+                                            })"
+                                            type="button"
+                                            id="dropdownStatus_@promo.Id"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            @(promo.Status switch {
+                                                "Active" => "Đang áp dụng",
+                                                "Inactive" => "Chưa áp dụng",
+                                                "Expired" => "Ngừng áp dụng",
+                                                _ => "Không xác định"
+                                            })
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @{
+                                                var statuses = new Dictionary<string, string> {
+                                                    { "Active", "Đang áp dụng" },
+                                                    { "Inactive", "Chưa áp dụng" },
+                                                    { "Expired", "Ngừng áp dụng" },
+                                                };
+                                            }
+                                            @foreach (var statusItem in statuses)
+                                            {
+                                                if (statusItem.Key != promo.Status)
+                                                {
+                                                    <li>
+                                                        <form asp-action="ChangeStatus" method="post" class="m-0 p-0">
+                                                            <input type="hidden" name="id" value="@promo.Id" />
+                                                            <input type="hidden" name="newStatus" value="@statusItem.Key" />
+                                                            <button type="submit" class="dropdown-item">@statusItem.Value</button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>@promo.StartDate.ToString("dd/MM/yyyy")</td>
+                                <td>@promo.EndDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@promo.Id" class="lni lni-pencil text-primary" title="Chỉnh sửa"></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+
+    <script>
+        function submitBulkStatus(status) {
+            const form = document.getElementById("bulkActionForm");
+            document.getElementById("bulkStatus").value = status;
+
+            const container = document.getElementById("selectedIdsContainer");
+            container.innerHTML = '';
+
+            const selectedIds = document.querySelectorAll(".rowCheckbox:checked");
+            if (selectedIds.length === 0) {
+                Swal.fire({ icon: 'warning', text: 'Vui lòng chọn ít nhất một khuyến mãi để cập nhật trạng thái.' });
+                return;
+            }
+
+            selectedIds.forEach(cb => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "ids";
+                input.value = cb.value;
+                container.appendChild(input);
+            });
+
+            form.submit();
+        }
+
+        function toggleAll(source) {
+            const checkboxes = document.querySelectorAll(".rowCheckbox");
+            checkboxes.forEach(cb => cb.checked = source.checked);
+            updateSelected();
+        }
+
+        function updateSelected() {
+            const count = document.querySelectorAll(".rowCheckbox:checked").length;
+            const bulkBar = document.getElementById("bulkActionBar");
+            const countSpan = document.getElementById("selectedCount");
+
+            if (count > 0) {
+                bulkBar.classList.add("show");
+                bulkBar.style.display = 'flex';
+                countSpan.innerHTML = `Đã chọn <strong>${count}</strong> khuyến mãi`;
+            } else {
+                bulkBar.classList.remove("show");
+                bulkBar.style.display = 'none';
+            }
+        }
+
+        $(document).ready(function () {
+            $('#promotionTable').DataTable({
+                language: {
+                    search: "Tìm kiếm:",
+                    lengthMenu: "Hiển thị _MENU_ dòng",
+                    info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                    paginate: {
+                        first: "Đầu",
+                        last: "Cuối",
+                        next: "→",
+                        previous: "←"
+                    },
+                    zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                    infoEmpty: "Không có dữ liệu",
+                    infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+                },
+                columnDefs: [
+                    { targets: [0, 1, 8], orderable: false }
+                ]
+            });
+        });
+    </script>
+}

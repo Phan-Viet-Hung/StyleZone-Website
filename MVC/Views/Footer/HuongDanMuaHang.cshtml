@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewData["Title"] = "HuongDanMuaHang";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active current" aria-current="page">Hướng mua hàng</li>
+    </ol>
+</nav>
+@{
+    ViewData["Title"] = "Hướng dẫn mua hàng";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<div class="container py-4" style="background-color: #f9f9f9;">
+    <div class="mx-auto bg-white p-4 p-md-5 shadow-sm rounded" style="max-width: 900px;">
+        <h2 class="fw-bold text-uppercase border-bottom pb-2 mb-4">Hướng dẫn mua hàng</h2>
+
+        <p>Quý khách vui lòng tham khảo thông tin chi tiết về từng bước đặt hàng như sau:</p>
+
+        <h5 class="fw-bold mt-4">BƯỚC 1: TÌM KIẾM VÀ CHỌN SẢN PHẨM YÊU THÍCH TRÊN WEBSITE</h5>
+        <p>Quý khách có thể tìm kiếm sản phẩm theo 2 cách:</p>
+        <ul>
+            <li>Gõ tên sản phẩm vào thanh tìm kiếm</li>
+            <li>Tìm theo danh mục sản phẩm trên thanh menu (Nam, Nữ, Vận động, Sản phẩm khuyến mại...)</li>
+        </ul>
+
+        <p>
+            Sau khi tìm thấy sản phẩm ưng ý, quý khách vui lòng vào trang chi tiết sản phẩm để chọn
+            <strong>Màu sắc</strong>, <strong>Kích cỡ</strong> và <strong>Số lượng</strong> rồi nhấn nút
+            <strong>"THÊM HÀNG VÀO GIỎ"</strong>.
+        </p>
+
+        <p>
+            Khi cửa sổ giỏ hàng hiển thị, quý khách có thể chọn “<strong>XEM GIỎ HÀNG</strong>” để kiểm tra sản phẩm đã chọn,
+            hoặc nhấn <strong>“THANH TOÁN”</strong> để tiến hành đặt hàng online.
+        </p>
+
+        <h5 class="fw-bold mt-4">BƯỚC 2: TIẾN HÀNH ĐẶT HÀNG VÀ THANH TOÁN</h5>
+        <p>Trên trang thanh toán, quý khách vui lòng điền đầy đủ thông tin để hoàn tất đơn hàng.</p>
+
+        <h6 class="fw-bold mt-3">I. ĐỊA CHỈ NGƯỜI MUA</h6>
+        <ul>
+            <li>Khách đã có tài khoản: đăng nhập để đặt hàng nhanh chóng.</li>
+            <li>Khách chưa có tài khoản: điền đầy đủ thông tin và có thể tạo tài khoản trong quá trình đặt hàng.</li>
+        </ul>
+        <p class="fst-italic text-muted">
+            * Style Zone khuyến khích đăng ký tài khoản để mua hàng nhanh hơn và nhận nhiều ưu đãi đặc biệt.
+        </p>
+
+        <h6 class="fw-bold mt-3">II. PHƯƠNG THỨC VẬN CHUYỂN</h6>
+        <p>
+            Style Zone áp dụng phí giao hàng theo khu vực.<br />
+            Mức phí mặc định hiện tại là: <strong>40.000 VNĐ</strong>.
+        </p>
+
+        <h6 class="fw-bold mt-3">III. PHƯƠNG THỨC THANH TOÁN</h6>
+        <p>Khách hàng có thể chọn 1 trong 2 hình thức sau:</p>
+        <ol>
+            <li>Thanh toán khi nhận hàng (COD)</li>
+            <li>Thanh toán online qua thẻ ATM, Visa, Master, JCB thông qua cổng Smartlink</li>
+        </ol>
+
+        <h5 class="fw-bold mt-4">BƯỚC 3: XÁC NHẬN ĐƠN HÀNG</h5>
+        <p>
+            Sau khi hoàn tất quá trình đặt hàng, quý khách vui lòng kiểm tra email xác nhận đơn hàng tại địa chỉ email đã cung cấp.
+        </p>
+
+        <p class="mt-3">
+            <strong>Lưu ý:</strong> Không chia sẻ mã đơn hàng với người khác để tránh các rủi ro không mong muốn.
+        </p>
+    </div>
+</div>
+
+
+

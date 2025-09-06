@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewData["Title"] = "SendOtppRegister";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<link href="~/css/CSS/SenOtp.css" rel="stylesheet" />
+
+    <nav class="breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb m-0 p-2">
+            <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Register</li>
+        </ol>
+    </nav>
+    <div class="forgot-password-container shadow-sm">
+        <h4 class="mb-3 text-center">Nhập email của bạn </h4>
+        <form asp-action="SendOtppRegister" asp-controller="LoginAccount" method="post">
+            <div class="mb-4 mt-4">
+                <label for="email" class="form-label">EMAIL</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Nhập Email của bạn" required />
+            </div>
+
+            <p style="color:red">@ViewBag.OtpMessage</p>
+
+            <button type="submit" class="btn btn-submit">Gửi</button>
+        </form>
+
+        <div class="back-login">
+            Trở lại <a asp-action="Login" asp-controller="LoginAccount">Đăng nhập</a>
+        </div>
+    </div>
+
+
+
+

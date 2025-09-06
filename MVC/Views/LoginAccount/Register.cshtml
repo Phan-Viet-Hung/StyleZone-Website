@@ -1,0 +1,99 @@
+﻿@model API.DomainCusTomer.Request.AccountCustomerRequest.RegisteCustomerRequest
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+
+<link href="~/css/CSS/Regiter.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Register</li>
+    </ol>
+</nav>
+
+<div class="register-container">
+    <div class="register-title">Đăng ký</div>
+    <div class="underline-title"></div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form asp-action="Register" asp-controller="LoginAccount" method="post" onsubmit="return validatePasswords()">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Email" name="Email" value="@ViewBag.Email1" />
+        <input type="hidden" asp-for="Otp" name="Otp" value="@ViewBag.Otp1" />
+
+        <div class="mb-3">
+            <label class="form-label">HỌ VÀ TÊN</label>
+            <input asp-for="Name" name="Name" class="form-control" placeholder="Nhập Tên" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">SĐT</label>
+            <input asp-for="PhoneNumber" name="PhoneNumber" class="form-control" placeholder="Nhập SĐT của bạn" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <!-- Mật khẩu -->
+        <div class="mb-3 position-relative">
+            <label class="form-label">MẬT KHẨU</label>
+            <input asp-for="Password" name="Password" class="form-control" placeholder="Nhập Mật khẩu" id="password" type="password" />
+            <i class="fa-regular fa-eye toggle-password" data-toggle="#password"></i>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- Xác nhận mật khẩu -->
+        <div class="mb-4 position-relative">
+            <label class="form-label">XÁC NHẬN MẬT KHẨU</label>
+            <input class="form-control" id="confirm-password" placeholder="Nhập lại Mật khẩu" type="password" />
+            <i class="fa-regular fa-eye toggle-password" data-toggle="#confirm-password"></i>
+            <div id="password-error" class="text-danger d-none">Mật khẩu không khớp.</div>
+        </div>
+
+        <button type="submit" class="btn btn-register">Đăng ký</button>
+        <div class="bottom-link">
+            Bạn đã có tài khoản? <a asp-action="Login" asp-controller="LoginAccount">Đăng nhập</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Toggle hiển thị/ẩn mật khẩu
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function () {
+                const input = document.querySelector(this.getAttribute('data-toggle'));
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+
+        // Validate xác nhận mật khẩu
+        function validatePasswords() {
+            const pass = document.getElementById("password").value;
+            const confirm = document.getElementById("confirm-password").value;
+            const error = document.getElementById("password-error");
+            if (pass !== confirm) {
+                error.classList.remove("d-none");
+                return false;
+            }
+            error.classList.add("d-none");
+            return true;
+        }
+
+        // Khi form Register submit thành công (trang được redirect), xóa expireTime
+        document.querySelector('form').addEventListener('submit', function () {
+            localStorage.removeItem("otpExpireTime");
+        });
+    </script>
+}

@@ -1,0 +1,39 @@
+﻿@using API.DomainCusTomer.DTOs.ThongTinCaNhaCustomer
+@model RePassDtoCustomer
+@{
+    ViewData["Title"] = "DoiMatKhau";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<link href="~/css/CSS/Taikhoancuatoi.css" rel="stylesheet" />
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Đổi Mật Khẩu</li>
+    </ol>
+</nav>
+<main>
+    <h1>Đổi Mật Khẩu</h1>
+    @if (TempData["errodoimatkhau"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["errodoimatkhau"]
+        </div>
+    }
+    <form asp-action="DoiMatKhau" method="post">
+        <div class="mb-4">
+            
+            <label asp-for="OldPassword" class="form-label">Nhập Mật Khẩu Cũ</label>
+            <input asp-for="OldPassword" type="password" class="form-control" required />
+           
+        </div>
+        <div class="mb-4">
+            <label asp-for="NewPassword" class="form-label">Nhập Mật Khẩu Mới</label>
+            <input asp-for="NewPassword" type="password" class="form-control" required />
+        </div>
+        <div class="mb-4">
+            <label asp-for="ReNewPassword" for="username" class="form-label">Nhập Lại Mật Khẩu Mới</label>
+            <input asp-for="ReNewPassword" type="password" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-orange">Lưu</button>
+    </form>
+</main>

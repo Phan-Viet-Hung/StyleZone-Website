@@ -1,0 +1,72 @@
+﻿@model API.Domain.Request.OriginRequest.CreateOriginRequest
+
+@{
+    ViewData["Title"] = "Thêm xuất xứ";
+}
+
+@section Styles {
+    <style>
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #6cbf6c, #529152);
+        }
+
+        input.form-control:focus,
+        textarea.form-control:focus {
+            border-color: #529152;
+            box-shadow: 0 0 0 0.1rem rgba(82, 145, 82, 0.25);
+        }
+
+        .fw-extra-bold {
+            font-weight: 800 !important;
+        }
+    </style>
+}
+
+<section class="create-origin-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-success text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0 fw-bold"><i class="lni lni-map-marker"></i> Thêm xuất xứ</h3>
+                        <p class="small mt-1 mb-0 fw-bold">Nhập thông tin chi tiết xuất xứ</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Create" method="post" novalidate>
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-semibold">Tên xuất xứ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-text-format"></i></span>
+                                    <input asp-for="Name" class="form-control" placeholder="Nhập tên xuất xứ..." />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="lni lni-comments-alt"></i></span>
+                                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Thêm mô tả chi tiết (nếu có)..."></textarea>
+                                </div>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="lni lni-save"></i> Lưu xuất xứ
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

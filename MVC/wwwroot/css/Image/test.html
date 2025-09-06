@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Môn Thể Thao Carousel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #333;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .carousel-container {
+            position: relative;
+            max-width: 1000px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .card {
+            min-width: 200px;
+            margin: 0 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            padding: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #222;
+            color: #fff;
+        }
+
+        .arrow-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1;
+            border-radius: 50%;
+        }
+
+        .arrow-left {
+            left: 10px;
+        }
+
+        .arrow-right {
+            right: 10px;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        .popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+    </style>
+</head>
+<body>
+
+    <h2>MÔN THỂ THAO</h2>
+
+    <div class="carousel-container">
+        <button class="arrow-btn arrow-left" onclick="moveSlide(-1)">&#10094;</button>
+        <div class="carousel-track" id="carousel-track">
+            <!-- Card 1 -->
+            <div class="card">
+                <img src="1.jpg" alt="Pickleball" />
+                <div class="card-title">Pickleball</div>
+            </div>
+            <!-- Card 2 -->
+            <div class="card">
+                <img src="https://via.placeholder.com/200x250?text=Chạy+bộ" alt="Chạy bộ" />
+                <div class="card-title">Chạy bộ</div>
+            </div>
+            <!-- Card 3 -->
+            <div class="card">
+                <img src="https://via.placeholder.com/200x250?text=Training" alt="Training" />
+                <div class="card-title">Training</div>
+            </div>
+            <!-- Card 4 -->
+            <div class="card">
+                <img src="https://via.placeholder.com/200x250?text=Bóng+rổ" alt="Bóng rổ" />
+                <div class="card-title">Bóng rổ</div>
+            </div>
+            <!-- Card 5 -->
+            <div class="card">
+                <img src="https://via.placeholder.com/200x250?text=Cầu+lông" alt="Cầu lông" />
+                <div class="card-title">Cầu lông</div>
+            </div>
+            <!-- Card 6 -->
+            <div class="card">
+                <img src="https://via.placeholder.com/200x250?text=Golf" alt="Golf" />
+                <div class="card-title">Golf</div>
+            </div>
+        </div>
+        <button class="arrow-btn arrow-right" onclick="moveSlide(1)">&#10095;</button>
+    </div>
+
+    <!-- Popup Khuyến mãi -->
+<div id="popupPromo" class="popup-overlay">
+  <div class="popup-content">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+    <img src="" alt="Khuyến mãi hè" class="img-fluid">
+  </div>
+</div>
+
+
+            <script>
+            // Hiển thị popup khi trang tải xong
+            window.onload = function () {
+                document.getElementById("popupPromo").style.display = "flex";
+            };
+
+            // Đóng popup khi bấm nút X
+            function closePopup() {
+                document.getElementById("popupPromo").style.display = "none";
+            }
+            </script>
+
+
+    <script>
+        let currentIndex = 0;
+        const track = document.getElementById('carousel-track');
+        const cardWidth = 220; // 200px + margin 10px left + right
+        const totalCards = track.children.length;
+        const visibleCards = 4; // Số card hiện trên màn hình cùng lúc
+
+        function moveSlide(direction) {
+            const maxIndex = totalCards - visibleCards;
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = 0;
+            if (currentIndex > maxIndex) currentIndex = maxIndex;
+            const translateX = -currentIndex * cardWidth;
+            track.style.transform = `translateX(${translateX}px)`;
+        }
+    </script>
+
+</body>
+</html>

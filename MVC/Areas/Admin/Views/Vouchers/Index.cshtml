@@ -1,0 +1,266 @@
+﻿@model IEnumerable<API.Domain.DTOs.VoucherDto>
+@{
+    ViewData["Title"] = "Danh sách mã giảm giá";
+    string defaultImage = "/images/no-image.png";
+}
+@section Styles {
+    @* <link rel="stylesheet" href="~/css/voucher.css" /> *@
+    <style>.table td, .table th {
+    max-width: 120px;
+    word-break: break-word;
+    white-space: normal;
+
+    .dropdown-menu form {
+    margin: 0;
+    padding: 0;
+}
+
+}
+</style>
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <!-- Tiêu đề -->
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh sách mã giảm giá</h2>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Bulk Action Bar -->
+            <form asp-action="BulkChangeStatus" method="post" id="bulkActionForm">
+                <div id="bulkActionBar" class="bg-light border-top p-3 d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                    <div id="selectedCount">Đã chọn <strong>0</strong> voucher</div>
+                    <input type="hidden" name="Status" id="bulkStatus" />
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-sm btn-outline-success" onclick="setBulkStatus('Active')">Áp dụng</button>
+                        <button type="submit" class="btn btn-sm btn-outline-warning" onclick="setBulkStatus('Inactive')">Chưa áp dụng</button>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="setBulkStatus('Expired')">Ngừng áp dụng</button>
+                    </div>
+                </div>
+
+                <!-- Hidden checkboxes -->
+                <div id="selectedIdsContainer"></div>
+            </form>
+
+        <!-- Table -->
+        <div class="tables-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-style mb-30">
+                        <!-- Nút tạo + xuất file nằm trên bảng, giống vị trí dropdown 'Hiển thị 10 dòng' -->
+                        <div class="row mb-3 align-items-center">
+                            <div class="col-md-6">
+                                <a asp-action="Create" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-circle"></i> Tạo voucher
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a class="text-primary fw-medium" role="button" asp-action="Export">
+                                    <i class="bi bi-upload"></i> Xuất file
+                                </a>
+                            </div>
+                        </div>
+                        <div class="table-wrapper table-responsive">
+                            <table id="voucherTable" class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)" /></th>
+                                        <th>Ảnh</th>
+                                        <th>Mã</th>
+                                        <th>Loại khuyến mại</th>
+                                        <th>Giá trị</th>
+                                        <th>Trạng thái</th>
+                                        <th>Số lượng</th>
+                                        <th>Ngày bắt đầu</th>
+                                        <th>Ngày kết thúc</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="voucherTableBody">
+                                    @foreach (var voucher in Model)
+                                    {
+                                        <tr>
+                                            <td><input type="checkbox" class="rowCheckbox" value="@voucher.Id" onclick="updateSelected()" /></td>
+                                            <td>
+                                                <img src="@(string.IsNullOrEmpty(voucher.ImageUrl) ? defaultImage : "https://localhost:7257" + voucher.ImageUrl)" width="50" height="50" style="object-fit: cover;" />
+                                            </td>
+                                            <td>
+                                                <a asp-action="Details" asp-route-id="@voucher.Id" class="text-decoration-none text-dark">
+                                                    <div class="fw-semibold text-primary">@voucher.Code</div>
+                                                    <div class="text-muted small">@voucher.Description</div>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @(voucher.DiscountType == "Percentage" ? "Phần trăm" : "Giá cố định")
+                                            </td>
+                                            <td>
+                                                @voucher.DiscountValue.ToString("0.##") @(voucher.DiscountType == "Percentage" ? "%" : "₫")
+                                            </td>
+                                            <td style="max-width: 130px; word-break: break-word; white-space: normal;">
+                                                <div class="dropdown">
+                                                    <a class="badge px-3 py-1 rounded-pill text-decoration-none dropdown-toggle @(voucher.Status switch {
+                                                           "Active" => "bg-success-subtle text-success",
+                                                           "Inactive" => "bg-warning-subtle text-warning",
+                                                           "Expired" => "bg-danger-subtle text-danger",
+                                                           _ => "bg-light text-dark"
+                                                       })"
+                                                       href="#"
+                                                       role="button"
+                                                       id="dropdownStatus_@voucher.Id"
+                                                       data-bs-toggle="dropdown"
+                                                       aria-expanded="false"
+                                                       style="cursor: pointer;">
+                                                        @(voucher.Status switch {
+                                                            "Active" => "Đang áp dụng",
+                                                            "Inactive" => "Chưa áp dụng",
+                                                            "Expired" => "Ngừng áp dụng",
+                                                            _ => "Không xác định"
+                                                        })
+                                                    </a>
+
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownStatus_@voucher.Id">
+                                                        @{
+                                                            var statuses = new Dictionary<string, string> {
+                                                                { "Active", "Đang áp dụng" },
+                                                                { "Inactive", "Chưa áp dụng" },
+                                                                { "Expired", "Ngừng áp dụng" },
+                                                            };
+                                                        }
+
+                                                        @foreach (var statusItem in statuses)
+                                                        {
+                                                            if (statusItem.Key != voucher.Status)
+                                                            {
+                                                                <li>
+                                                                    <form asp-action="ChangeStatus" method="post" class="m-0 p-0">
+                                                                        <input type="hidden" name="Id" value="@voucher.Id" />
+                                                                        <input type="hidden" name="Status" value="@statusItem.Key" />
+                                                                        <button type="submit" class="dropdown-item">@statusItem.Value</button>
+                                                                    </form>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+                                            <td>@voucher.TotalUsageLimit.ToString()</td>
+                                            <td>@voucher.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@voucher.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@voucher.Id"
+                                                   class="lni lni-pencil text-primary"
+                                                   title="Chỉnh sửa"></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+
+    <script>
+        function setBulkStatus(status) {
+            const form = document.getElementById("bulkActionForm");
+            document.getElementById("bulkStatus").value = status;
+
+            // Xóa các input ẩn cũ (nếu reload nhiều lần)
+            const container = document.getElementById("selectedIdsContainer");
+            container.innerHTML = '';
+
+            // Tạo input hidden cho mỗi checkbox đã chọn
+            const selectedIds = document.querySelectorAll(".rowCheckbox:checked");
+            selectedIds.forEach(cb => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "Ids";
+                input.value = cb.value;
+                container.appendChild(input);
+        });
+
+        form.submit(); // Submit bằng JavaScript để đảm bảo dữ liệu đã sẵn sàng
+    }
+        function toggleAll(source) {
+            const checkboxes = document.querySelectorAll(".rowCheckbox");
+            checkboxes.forEach(cb => {
+                cb.checked = source.checked;
+            });
+            updateSelected(); // Cập nhật đúng sau khi check/uncheck all
+        }
+
+        function updateSelected() {
+            const count = document.querySelectorAll(".rowCheckbox:checked").length;
+            const bulkBar = document.getElementById("bulkActionBar");
+            const countSpan = document.getElementById("selectedCount");
+
+            if (count > 0) {
+                bulkBar.classList.add("show");
+                bulkBar.style.display = 'flex'; // <- Thêm dòng này để hiển thị
+                countSpan.innerHTML = `Đã chọn <strong>${count}</strong> khuyến mại`;
+            } else {
+                bulkBar.classList.remove("show");
+                bulkBar.style.display = 'none'; // <- Ẩn lại
+            }
+        }
+
+        function bulkChangeStatus(newStatus) {
+            const ids = Array.from(document.querySelectorAll(".rowCheckbox:checked")).map(cb => cb.value);
+            if (ids.length === 0) return;
+
+            const statusText = {
+                "Active": "Đang áp dụng",
+                "Inactive": "Chưa áp dụng",
+                "Expired": "Ngừng áp dụng"
+            };
+
+            const confirmText = `Bạn có chắc muốn đổi trạng thái ${ids.length} voucher sang '${statusText[newStatus] || newStatus}' không?`;
+            if (!confirm(confirmText)) return;
+
+            $.ajax({
+                url: '/Voucher/BulkChangeStatus',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ ids, status: newStatus }),
+                success: () => location.reload(),
+                error: () => alert("Không thể đổi trạng thái hàng loạt.")
+            });
+        }
+
+        $('#voucherTable').DataTable({
+            language: {
+                search: "Tìm kiếm:",
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                paginate: {
+                    first: "Đầu",
+                    last: "Cuối",
+                    next: "→",
+                    previous: "←"
+                },
+                zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                infoEmpty: "Không có dữ liệu",
+                infoFiltered: "(lọc từ tổng _MAX_ dòng)"
+            },
+            columnDefs: [
+                { targets: [0, 1, 9], orderable: false }
+            ]
+        });
+    </script>
+}

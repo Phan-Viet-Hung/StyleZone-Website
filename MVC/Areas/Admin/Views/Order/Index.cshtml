@@ -1,0 +1,268 @@
+﻿@model List<API.Domain.DTOs.OrderDto>
+@using DAL_Empty.Models
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+}
+
+@section Styles {
+    <style>
+        .table td, .table th {
+            vertical-align: middle;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .table-wrapper {
+            overflow-x: unset !important;
+        }
+    </style>
+}
+
+<section class="table-components">
+    <div class="container-fluid">
+        <!-- Tiêu đề -->
+        <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title">
+                        <h2>Danh sách đơn hàng</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút + Export -->
+        <div class="card-style mb-30">
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-6">
+                    <form asp-action="UpdateStatusBulk" method="post" id="bulkForm" class="d-flex">
+                        <select name="status" class="form-select w-auto me-2">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="1">Pending</option>
+                            <option value="2">Confirmed</option>
+                            <option value="3">Processing</option>
+                            <option value="4">Shipping</option>
+                            <option value="5">Delivered</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Cập nhật hàng loạt</button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a asp-action="Export" class="text-primary fw-medium">
+                        <i class="bi bi-upload"></i> Xuất file
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper table-responsive">
+                <table id="ordersTable" class="table align-middle table-hover table-bordered">
+                    <thead class="table-light text-center align-middle">
+                        <tr>
+                            <th style="width:40px;"><input type="checkbox" id="selectAll" /></th>
+                            <th style="width:50px;">STT</th>
+                            <th>Khách hàng</th>
+                            <th>SDT</th>
+                            <th>Tổng tiền</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            int stt = 1;
+                            foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (order.Status != OrderStatus.Delivered && order.Status != OrderStatus.Cancelled)
+                                        {
+                                            <input type="checkbox" form="bulkForm" name="orderIds" value="@order.Id" />
+                                        }
+                                    </td>
+                                    <td>@stt</td>
+                                    <td>@order.CustomerName</td>
+                                    <td>@order.PhoneNumber</td>
+                                    <td>@order.TotalAmount?.ToString("N0") VND</td>
+                                    <td>@order.CreateAt?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (order.Status == OrderStatus.Delivered || order.Status == OrderStatus.Cancelled)
+                                        {
+                                            <!-- Badge tĩnh -->
+                                            <span class="badge px-3 py-1 rounded-pill
+                                                @(order.Status switch {
+                                                    OrderStatus.Delivered => "bg-success-subtle text-success",
+                                                    OrderStatus.Cancelled => "bg-danger-subtle text-danger",
+                                                    _ => "bg-light text-dark"
+                                                })">
+                                                @(order.Status switch
+                                                {
+                                                    OrderStatus.Delivered => "Delivered",
+                                                    OrderStatus.Cancelled => "Cancelled",
+                                                    _ => "Unknown"
+                                                })
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <!-- Dropdown -->
+                                            <div class="dropdown">
+                                                <a class="badge px-3 py-1 rounded-pill text-decoration-none dropdown-toggle @(order.Status switch {
+                                                    OrderStatus.Pending => "bg-warning-subtle text-warning",
+                                                    OrderStatus.Confirmed => "bg-info-subtle text-info",
+                                                    OrderStatus.Processing => "bg-primary-subtle text-primary",
+                                                    OrderStatus.Shipping => "bg-secondary-subtle text-secondary",
+                                                    _ => "bg-light text-dark"
+                                                })"
+                                                   href="#"
+                                                   role="button"
+                                                   id="dropdownStatus_@order.Id"
+                                                   data-bs-toggle="dropdown"
+                                                   aria-expanded="false">
+                                                    @(order.Status switch
+                                                    {
+                                                        OrderStatus.Pending => "Pending",
+                                                        OrderStatus.Confirmed => "Confirmed",
+                                                        OrderStatus.Processing => "Processing",
+                                                        OrderStatus.Shipping => "Shipping",
+                                                        _ => "Unknown"
+                                                    })
+                                                </a>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownStatus_@order.Id">
+                                                    @{
+                                                        var statuses = new Dictionary<int, string> {
+                                        { 1, "Pending" },
+                                        { 2, "Confirmed" },
+                                        { 3, "Processing" },
+                                        { 4, "Shipping" },
+                                        { 5, "Delivered" },
+                                        { 6, "Cancelled" }
+                                        };
+                                                    }
+
+                                                    @foreach (var statusItem in statuses)
+                                                    {
+                                                        if (statusItem.Key == (int)order.Status + 1 || statusItem.Key == 6)
+                                                        {
+                                                            if (statusItem.Key == 6) // Cancelled → modal
+                                                            {
+                                                                <li>
+                                                                    <a href="javascript:void(0);"
+                                                                       class="dropdown-item text-danger"
+                                                                       onclick="openCancelModal('@order.Id')">
+                                                                        Cancelled
+                                                                    </a>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li>
+                                                                    <form asp-action="UpdateStatus" method="post" class="m-0 p-0">
+                                                                        <input type="hidden" name="OrderId" value="@order.Id" />
+                                                                        <input type="hidden" name="Status" value="@statusItem.Key" />
+                                                                        <button type="submit" class="dropdown-item">@statusItem.Value</button>
+                                                                    </form>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@order.Id" class="lni lni-zoom-in text-info" title="Xem chi tiết"></a>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Không có đơn hàng nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Hủy Đơn -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="cancelOrderForm" method="post" asp-action="CancelOrder">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="cancelOrderLabel">Hủy đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="OrderId" id="cancelOrderId" />
+                    <div class="mb-3">
+                        <label for="cancelReason" class="form-label">Lý do hủy</label>
+                        <textarea class="form-control" name="Reason" id="cancelReason" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openCancelModal(orderId) {
+            document.getElementById("cancelOrderId").value = orderId;
+            document.getElementById("cancelReason").value = "";
+            var modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+            modal.show();
+        }
+
+        $(document).ready(function () {
+            // DataTables
+            var table = $('#ordersTable').DataTable({
+                language: {
+                    search: "Tìm kiếm:",
+                    lengthMenu: "Hiển thị _MENU_ đơn hàng",
+                    info: "Hiển thị _START_ đến _END_ của _TOTAL_ đơn hàng",
+                    paginate: {
+                        first: "Đầu",
+                        last: "Cuối",
+                        next: "›",
+                        previous: "‹"
+                    },
+                    zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                    infoEmpty: "Không có dữ liệu",
+                    infoFiltered: "(lọc từ tổng _MAX_ đơn hàng)"
+                },
+                pageLength: 10,
+                columnDefs: [
+                    { targets: 0, orderable: false }, // ô checkbox
+                    { targets: "_all", className: "text-center align-middle" }
+                ],
+                order: [[1, 'asc']] // 👈 mặc định sort theo STT
+            });
+
+            // Chọn tất cả checkbox
+            $('#selectAll').on('change', function () {
+                var isChecked = $(this).is(':checked');
+                $('#ordersTable').find('input[name="orderIds"]').prop('checked', isChecked);
+            });
+
+            // Reset checkbox tổng khi đổi trang
+            table.on('draw', function () {
+                $('#selectAll').prop('checked', false);
+            });
+        });
+    </script>
+}

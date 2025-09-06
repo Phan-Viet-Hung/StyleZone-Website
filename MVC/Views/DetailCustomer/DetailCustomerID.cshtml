@@ -1,0 +1,787 @@
+﻿@using API.DomainCusTomer.DTOs.DetailCustomer
+@model DetailCustomerDto
+@{
+    ViewData["Title"] = "DetailCustomerID";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+    var imageUrls = new List<string>();
+
+    if (!string.IsNullOrEmpty(Model.MainImageUrl))
+        imageUrls.Add("https://localhost:7257/" + Model.MainImageUrl);
+
+    if (Model.ImageUrls != null && Model.ImageUrls.Any())
+        imageUrls.AddRange(Model.ImageUrls.Select(url => "https://localhost:7257/" + url));
+
+    bool hasActivePromotion = false;
+    decimal? priceBefore = null;
+    decimal? priceAfter = null;
+
+    if (Model.Status != null)
+    {
+        for (int i = 0; i < Model.Status.Count; i++)
+        {
+            if ((int)Model.Status[i] == 1)
+            {
+                hasActivePromotion = true;
+                priceBefore = Model.PriceBeforeReduction?.ElementAtOrDefault(i);
+                priceAfter = Model.Priceafterduction?.ElementAtOrDefault(i);
+                break;
+            }
+        }
+    }
+
+    bool noPromotion = Model.PromotionProductId == null || !Model.PromotionProductId.Any();
+    bool allInactive = !hasActivePromotion;
+}
+<link href="~/css/CSS/StyleDetail.css" rel="stylesheet" />
+<style>
+    .color-option {
+        position: relative;
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+    }
+
+    .color-label {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+        /* Hover làm sáng và viền đậm */
+        .color-label:hover {
+            border-color: #666;
+            transform: scale(1.1);
+        }
+
+    /* Khi được chọn */
+    .color-radio:checked + .color-label {
+        border-color: #e60023; /* Viền đỏ */
+        box-shadow: 0 0 0 3px rgba(230, 0, 35, 0.3);
+        transform: scale(1.2);
+    }
+
+    /* Ẩn input radio gốc */
+    .color-radio {
+        display: none;
+    }
+    /* Với màu bị disable */
+    .color-label.disabled {
+        position: relative;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+        .color-label.disabled::after {
+            content: "✕";
+            position: absolute;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    /* Với size bị disable */
+    .size-btn.disabled {
+        position: relative;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+        .size-btn.disabled::after {
+            content: "✕";
+            position: absolute;
+            color: red;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    #slideCart {
+        position: fixed;
+        right: -400px;
+        top: 100px;
+        width: 350px;
+        height: 200px;
+        background: #fff;
+        box-shadow: -2px 0 8px rgba(0,0,0,0.3);
+        transition: right 0.3s ease;
+        padding: 20px;
+        z-index: 1050;
+    }
+
+        #slideCart.show {
+            right: 200px;
+        }
+
+    #cartOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1040;
+    }
+
+        #cartOverlay.active {
+            display: block;
+        }
+
+    .readonly-option {
+        opacity: 0.5;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+</style>
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+</nav>
+
+<main class="container my-4">
+    <div class="row gx-4">
+        <!-- Thumbnail list -->
+        <div class="col-md-1 d-none d-md-block thumbnail-list">
+            @if (imageUrls != null && imageUrls.Count > 0)
+            {
+                for (int i = 0; i < imageUrls.Count; i++)
+                {
+                    var imgSrc = imageUrls[i];
+                    <img src="@imgSrc"
+                         alt="Ảnh @i"
+                         class="product-img img-fluid mb-2 @(i == 0 ? "active" : "")"
+                         data-full="@imgSrc" />
+                }
+            }
+        </div>
+
+        <!-- Main product image -->
+        <div class="col-md-5 d-flex justify-content-center align-items-center">
+            <img id="main-product-image"
+                 src="@imageUrls.FirstOrDefault()"
+                 class="product-img img-fluid"
+                 alt="@Model.Name"
+                 style="max-height: 350px; object-fit: contain;" />
+        </div>
+
+        <!-- Product information -->
+        <div class="col-md-6">
+            <h1 class="h5 fw-semibold">@Model.Name</h1>
+            <div class="d-flex flex-wrap gap-2 mt-1" style="font-size: 12px; color: #666;">
+                <span>Loại: @Model.CategoryName</span>
+                <span>|</span>
+                <span>Mã SP: <span id="selected-size">@Model.CodeProductDetail</span></span>
+            </div>
+
+            @if (noPromotion || allInactive || priceBefore == null || priceAfter == null)
+            {
+                <p class="product-price" style="color: red; font-weight: bold;">
+                    @String.Format("{0:#,##0}₫", Model.Price)
+                </p>
+            }
+            else
+            {
+                <p class="product-price">
+                    <span style="color: red; font-weight: bold;">
+                        @String.Format("{0:#,##0}₫", priceAfter)
+                    </span>
+                    <span class="text-muted text-decoration-line-through" style="font-size: 13px; margin-left: 5px;">
+                        @String.Format("{0:#,##0}₫", priceBefore)
+                    </span>
+                </p>
+            }
+
+            <div class="mt-4" style="font-size: 12px; color: #444;">
+                <!-- Material -->
+                <div class="d-flex align-items-center mb-2">
+                    <div style="width: 80px;">Chất liệu</div>
+                    <button class="btn btn-outline-secondary btn-sm px-2 py-1" disabled>
+                        @Model.MaterialName
+                    </button>
+                </div>
+
+                <!-- Colors -->
+                <div class="d-flex align-items-center mb-2">
+                    <div style="width: 80px;">Màu sắc</div>
+                    <div class="d-flex gap-2 flex-wrap" id="color-options">
+                        @if (Model.AllColors != null && Model.AllColors.Count > 0)
+                        {
+                            @foreach (var color in Model.AllColors)
+                            {
+                                bool isSelected = Model.ColorCode == color.Code;
+                                <div class="color-option">
+                                    <input type="radio" name="color" id="color-@color.Id"
+                                           class="color-radio" value="@color.Id" data-color="@color.Code"
+                                    @(isSelected ? "checked" : "")>
+                                    <label for="color-@color.Id" class="color-label" style="background-color:@color.Code"></label>
+                                </div>
+                            }
+                        }
+                        else if (Model.AllColors != null)
+                        {
+                            <div class="color-option readonly-option">
+                                <input type="radio" name="color" id="color-@Model.ColorCode"
+                                       class="color-radio" value="@Model.Id" data-color="@Model.ColorCode" checked="checked" disabled>
+                                <label for="color-@Model.Id" class="color-label" style="background-color:@Model.ColorCode"></label>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có màu</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Sizes -->
+                <div class="d-flex align-items-center mb-2">
+                    <div style="width: 80px;">Kích thước</div>
+                    <div class="d-flex gap-2 flex-wrap" id="size-buttons">
+                        @if (Model.AllSizes != null && Model.AllSizes.Count > 0)
+                        {
+                            foreach (var size in Model.AllSizes)
+                            {
+                                bool isSelected = Model.SizeId == size.Id || Model.Code == size.Code;
+                                <div class="size-btn @(isSelected ? "active" : "")" data-size="@size.Id">@size.Code</div>
+                            }
+                        }
+                        else if (Model.AllSizes != null)
+                        {
+                            <div class="size-btn readonly-option" data-size="@Model.Code">@Model.Code</div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có kích thước</span>
+                        }
+                    </div>
+                </div>
+
+
+
+                <!-- Quantity -->
+                <div class="d-flex align-items-center mb-2">
+                    <div style="width: 80px;">Số lượng</div>
+                    <div class="d-flex align-items-center " style="width: 180px;">
+                        <button id="qty-decrease" class="quantity-control">−</button>
+                        <input type="text" id="qty-input" class="quantity-input" value="1" readonly aria-label="Số lượng" />
+                        <button id="qty-increase" class="quantity-control">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2 mt-3">
+                <button id="btnAddToCart" class="btn btn-add-cart flex-grow-1">Thêm vào giỏ</button>
+                <button id="btnMuaNgay" class="btn btn-buy flex-grow-1">Mua ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide Cart -->
+    <div id="slideCart" role="alertdialog" aria-labelledby="slideCartTitle" aria-modal="true" tabindex="-1">
+        <button class="btn-close-cart" aria-label="Close cart">&times;</button>
+        <h5 id="slideCartTitle">✅ Đã thêm vào giỏ</h5>
+        <div class="d-flex gap-3 mb-3">
+        
+            <img alt="@Model.Name" class="img-fluid" height="60" id="cartImage"
+                 src="@imageUrls.FirstOrDefault()"
+                 width="60" />
+            <div class="small text-secondary">
+                <div class="mb-1" id="cartProductDesc">
+                    Loại: @Model.CategoryName
+                </div>
+                <div id="cartQuantity">Số lượng: 1</div>
+
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="#" class="btn btn-outline-secondary w-50 py-2 fs-5 fw-semibold text-center">
+                Mua thêm
+            </a>
+            <a asp-action="ListCartId" asp-controller="CartCustomerID" class="btn btn-dark w-50 py-2 fs-5 fw-semibold text-center">
+                Xem ngay
+            </a>
+        </div>
+    </div>
+    <div id="cartOverlay"></div>
+    <form id="addToCartForm" asp-action="AddToCartID" asp-controller="CartCustomerID" method="post">
+        <input type="hidden" name="ProductDetailcode" id="cartProductCodeHidden" value="@Model.CodeProductDetail" />
+        <input type="hidden" name="Quantity" id="cartQuantityHidden" />
+        @Html.AntiForgeryToken()
+    </form>
+
+    <!-- Form Mua Ngay -->
+    <form id="muaNgayForm" asp-action="AddMuaNgayID" asp-controller="ThanhToanCustomerId" method="post">
+        <input type="hidden" name="ProductDetailcodeMuaNgay" id="cartProductCodeHiddenMuaNgay" value="@Model.CodeProductDetail" />
+        <input type="hidden" name="QuantityMuaNgay" id="cartQuantityHiddenMuaNgay" />
+        @Html.AntiForgeryToken()
+    </form>
+    <!-- Description -->
+    <section class="mt-5" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+        <ul class="nav nav-tabs border-0 mb-3" id="descTab" role="tablist" style="font-size: 12px;">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="mo-ta-tab" data-bs-toggle="tab" data-bs-target="#mo-ta"
+                        type="button" role="tab" aria-controls="mo-ta" aria-selected="true">
+                    MÔ TẢ SẢN PHẨM
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="huong-dan-tab" data-bs-toggle="tab" data-bs-target="#huong-dan"
+                        type="button" role="tab" aria-controls="huong-dan" aria-selected="false">
+                    HƯỚNG DẪN ĐO SIZE VÀ BẢO QUẢN
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="descTabContent" style="font-size: 12px; color: #444;">
+            <div class="tab-pane fade show active" id="mo-ta" role="tabpanel" aria-labelledby="mo-ta-tab">
+                <div id="product-description" class="product-description">
+                    <p class="fw-semibold mb-1">@Model.Name</p>
+                    <ul>
+                        <li>Form dáng: @Model.CategoryName</li>
+                        <li>Chất liệu vải: @Model.MaterialName</li>
+                        <li>Nhà cung cấp: @Model.SupplierName</li>
+                        <li>Xuất xứ: @Model.OriginName</li>
+                    </ul>
+                    <p><strong>@Model.Name</strong> @Model.ProductDescription.</p>
+                    <div class="d-flex justify-content-center my-3">
+                        <img src="@($"https://localhost:7257/{(string.IsNullOrEmpty(Model.ImageUrls.FirstOrDefault())  ? "images/default.jpg": Model.ImageUrls.FirstOrDefault())}")" alt="@Model.Name" style="max-height: 350px; object-fit: contain;" class="img-fluid" />
+                        
+                    </div>
+                </div>
+                <button id="toggle-desc" class="btn-toggle-desc" aria-expanded="false">Xem thêm</button>
+            </div>
+            <div class="tab-pane fade" id="huong-dan" role="tabpanel" aria-labelledby="huong-dan-tab"
+                 style="font-size: 12px; color: #444;">
+                <div class="container py-4">
+                    <h2 class="fw-bold text-uppercase border-bottom pb-2 mb-4">Hướng dẫn đo size và bảo quản</h2>
+
+                    <h5 class="fw-bold mt-4">1. HƯỚNG DẪN ĐO SIZE QUẦN ÁO VÀ BẢO QUẢN QUẦN ÁO</h5>
+
+                    <h6 class="fw-semibold mt-3">1.1. Hướng dẫn đo size quần áo</h6>
+                    <p>Giữ thước dây theo chiều ngang để đo các vùng sau:</p>
+                    <ul>
+                        <li><strong>Ngực:</strong> Đo quanh vùng ngực ở vị trí nở nhất</li>
+                        <li><strong>Eo:</strong> Đo quanh vùng eo ở vị trí nhỏ nhất</li>
+                        <li><strong>Hông:</strong> Quấn thước quanh mông ở vị trí lớn nhất</li>
+                        <li><strong>Chiều dài áo:</strong> Đo từ giữa cổ, qua đầu vai đến điểm mong muốn</li>
+                    </ul>
+
+                    <div class="text-center my-3">
+                        <img src="https://file.hstatic.net/1000312752/file/qao_6be8f6e213cc43d0ab39c47f78ad7f5f_grande.jpg" alt="Minh họa đo kích thước cơ thể" class="img-fluid rounded border" />
+                    </div>
+
+                    <h6 class="fw-semibold mt-3">1.2. Hướng dẫn bảo quản quần áo</h6>
+                    <ul>
+                        <li>Sử dụng nước dưới 40 độ để giặt sản phẩm</li>
+                        <li>Không dùng thuốc tẩy hoặc bột giặt mạnh</li>
+                        <li>Dùng túi giặt khi giặt máy</li>
+                        <li>Tránh phơi trực tiếp dưới ánh nắng gắt</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4">2. HƯỚNG DẪN ĐO SIZE GIÀY VÀ CÁCH BẢO QUẢN GIÀY</h5>
+
+                    <h6 class="fw-semibold mt-3">2.1. Hướng dẫn đo size giày</h6>
+                    <p><strong>Chiều dài chân:</strong></p>
+                    <ul>
+                        <li>Đo từ gót đến ngón dài nhất</li>
+                        <li>Nên đo vào cuối ngày khi chân giãn nở</li>
+                        <li>Đặt chân lên giấy, đánh dấu hai đầu và đo</li>
+                        <li>Nếu lệch chân, lấy số trung bình</li>
+                    </ul>
+
+                    <p><strong>Size giày chuẩn Á:</strong></p>
+                    <p>Để tính size giày theo chuẩn Á, dùng công thức:</p>
+                    <div class="border p-2 rounded bg-light mb-3">
+                        <strong>Size (CM) = Chiều dài bàn chân + 0.5</strong>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <img src="https://file.hstatic.net/1000312752/file/giay_7ff185b3c1d04946a2ae3a44e88ad12f_grande.jpg"
+                             class="img-fluid rounded border"
+                             alt="Hướng dẫn đo chân"
+                             style="max-width: 300px;" />
+                    </div>
+
+                    <h6 class="fw-semibold mt-3">2.2. Hướng dẫn bảo quản giày</h6>
+                    <ul>
+                        <li>Bảo quản nơi khô ráo, thoáng mát</li>
+                        <li>Dùng túi hút ẩm hoặc giấy hút mùi</li>
+                        <li>Không giặt máy, không dùng hóa chất mạnh</li>
+                        <li>Dùng xịt bảo vệ da, form giữ giày</li>
+                        <li>Tránh ánh nắng gắt và nhiệt độ cao</li>
+                    </ul>
+                    <!-- Nội dung hướng dẫn... -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related products -->
+    <hr style="border-top: 4px solid rgb(50, 153, 243);">
+    <section class="related-products-section">
+        <div class="container">
+            <h2 class="related-products-title">CÓ THỂ BẠN CŨNG THÍCH</h2>
+            <div class="related-products-wrapper">
+                <button class="related-product-arrow prev">‹</button>
+                <div class="related-products-viewport">
+                    <div class="related-products-grid">
+                        @foreach (var a in Model.ProductDetailsSameCategory)
+                        {
+                            <div class="related-product-card">
+                                <a asp-action="DetailCustomerID" asp-controller="DetailCustomer" asp-route-id="@a.Id" class="text-decoration-none">
+                                    <img src="@($"https://localhost:7257/{(string.IsNullOrEmpty(a.ImageUrl) ? "images/default.jpg" : a.ImageUrl)}")" />
+                                    <p class="related-product-name">@a.Name</p>
+                                    <p class="related-product-price">@String.Format("{0:#,##0}₫", a.Price)</p>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <button class="related-product-arrow next">›</button>
+            </div>
+        </div>
+    </section>
+    <hr style="border-top: 4px solid rgb(50, 153, 243);">
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const addBtn = document.getElementById("btnAddToCart");
+            const addBtnMuaNgay = document.getElementById("btnMuaNgay");
+            const formAdd = document.getElementById("addToCartForm");
+            const formMuaNgay = document.getElementById("muaNgayForm");
+            const qtyInput = document.getElementById("qty-input");
+            const qtyHidden = document.getElementById("cartQuantityHidden");
+            const qtyHiddenMuaNgay = document.getElementById("cartQuantityHiddenMuaNgay");
+
+            const btnIncrease = document.getElementById("qty-increase");
+            const btnDecrease = document.getElementById("qty-decrease");
+
+            // 🛒 Lấy tồn kho từ Razor
+            const maxStock = @Model.Quantity; // Ví dụ: 10
+
+            function checkStock() {
+                let val = parseInt(qtyInput.value) || 1;
+                btnIncrease.disabled = (val >= maxStock);
+                btnDecrease.disabled = (val <= 1);
+            }
+
+            // Nút tăng
+            btnIncrease.addEventListener("click", function () {
+                let val = parseInt(qtyInput.value) || 1;
+                if (val < maxStock) qtyInput.value = val + 1;
+                checkStock();
+            });
+
+            // Nút giảm
+            btnDecrease.addEventListener("click", function () {
+                let val = parseInt(qtyInput.value) || 1;
+                if (val > 1) qtyInput.value = val - 1;
+                checkStock();
+            });
+
+            qtyInput.addEventListener("input", checkStock);
+            checkStock();
+
+            // === Thêm vào giỏ ===
+            addBtn.addEventListener("click", async function (e) {
+                e.preventDefault();
+                qtyHidden.value = qtyInput.value;
+                if (!validateColorSize()) return;
+
+                fetch(formAdd.action, {
+                    method: "POST",
+                    body: new FormData(formAdd),
+                })
+                    .then(res => {
+                        if (res.ok) {
+                            showSlideCart(qtyInput.value);
+                        } else {
+                            alert("Số lượng không đủ");
+                        }
+                    })
+                    .catch(err => console.error("Lỗi:", err));
+            });
+
+            // === Mua Ngay ===
+            addBtnMuaNgay.addEventListener("click", async function (e) {
+                e.preventDefault();
+                qtyHiddenMuaNgay.value = qtyInput.value;
+                if (!validateColorSize()) return;
+
+                try {
+                    const response = await fetch(formMuaNgay.action, {
+                        method: "POST",
+                        body: new FormData(formMuaNgay),
+                    });
+
+                    if (response.ok) {
+                        window.location.href = "/ThanhToanCustomerId/IndexMuaNgayID";
+                    } else {
+                        const errorMessage = await response.text();
+                        alert(errorMessage || "Không thể mua ngay.");
+                    }
+                } catch (err) {
+                    console.error("Lỗi:", err);
+                    alert("Đã xảy ra lỗi khi thực hiện yêu cầu.");
+                }
+            });
+
+            function validateColorSize() {
+                const colorRadio = document.querySelector('.color-radio:checked');
+                const sizeBtn = document.querySelector('.size-btn.active');
+                const colorReadonly = document.querySelector('.color-option.readonly-option');
+                const sizeReadonly = document.querySelector('.size-btn.readonly-option');
+
+                if (!colorRadio && !colorReadonly) {
+                    alert("Vui lòng chọn màu trước khi thêm!");
+                    return false;
+                }
+                if (!sizeBtn && !sizeReadonly) {
+                    alert("Vui lòng chọn kích thước trước khi thêm!");
+                    return false;
+                }
+                return true;
+            }
+
+            function showSlideCart(quantity) {
+                document.getElementById("cartQuantity").textContent = "Số lượng: " + quantity;
+                document.getElementById("slideCart").classList.add("show");
+                document.getElementById("cartOverlay").classList.add("active");
+
+                setTimeout(() => {
+                    closeSlideCart();
+                    window.location.reload();
+                }, 3000);
+            }
+
+            function closeSlideCart() {
+                document.getElementById("slideCart").classList.remove("show");
+                document.getElementById("cartOverlay").classList.remove("active");
+            }
+
+            document.querySelector(".btn-close-cart").addEventListener("click", closeSlideCart);
+            document.getElementById("cartOverlay").addEventListener("click", closeSlideCart);
+        });
+    </script>
+}
+
+<script>
+
+    // Thumbnail click to update main image
+    const thumbnails = document.querySelectorAll(".thumbnail-list img");
+    const mainImage = document.getElementById("main-product-image");
+    thumbnails.forEach((thumb) => {
+        thumb.addEventListener("click", () => {
+            thumbnails.forEach((t) => t.classList.remove("active"));
+            thumb.classList.add("active");
+            mainImage.src = thumb.dataset.full;
+            mainImage.alt = thumb.alt;
+        });
+    });
+
+    // Product description toggle
+    const desc = document.getElementById("product-description");
+    const toggleBtn = document.getElementById("toggle-desc");
+    toggleBtn.addEventListener("click", () => {
+        const expanded = desc.classList.toggle("expanded");
+        toggleBtn.textContent = expanded ? "Thu gọn" : "Xem thêm";
+        toggleBtn.setAttribute("aria-expanded", expanded);
+    });
+    // co thể bạn sẽ thích
+    document.addEventListener('DOMContentLoaded', function () {
+        const track = document.querySelector('.related-products-grid');
+        const items = document.querySelectorAll('.related-product-card');
+        const nextButton = document.querySelector('.related-product-arrow.next');
+        const prevButton = document.querySelector('.related-product-arrow.prev');
+
+        if (!track || items.length === 0 || !nextButton || !prevButton) return;
+
+        let itemsPerPage = window.innerWidth < 768 ? 2 : 4;
+
+        const totalItems = items.length;
+        let currentIndex = 0;
+
+        function updateArrows() {
+            prevButton.disabled = currentIndex === 0;
+            nextButton.disabled = currentIndex >= Math.ceil(totalItems / itemsPerPage) - 1;
+        }
+
+        function slide() {
+            const container = document.querySelector('.related-products-viewport');
+            const containerWidth = container.offsetWidth;
+            const slideDistance = containerWidth * currentIndex;
+            track.style.transform = `translateX(-${slideDistance}px)`;
+            updateArrows();
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < Math.ceil(totalItems / itemsPerPage) - 1) {
+                currentIndex++;
+                slide();
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                slide();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            itemsPerPage = window.innerWidth < 768 ? 2 : 4;
+            updateArrows();
+            slide();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sizeButtons = document.querySelectorAll(".size-btn");
+        const colorRadios = document.querySelectorAll('.color-radio');
+        const selectedSizeSpan = document.getElementById("selected-size");
+
+        const colorSizeMap = @Html.Raw(Json.Serialize(Model.ColorSizeMap ?? new Dictionary<Guid, List<Guid>>()));
+        const sizeColorMap = @Html.Raw(Json.Serialize(Model.SizeColorMap ?? new Dictionary<Guid, List<Guid>>()));
+        const productVariantMap = @Html.Raw(Json.Serialize(Model.ProductVariantMap ?? new Dictionary<string, string>()));
+
+        let lastSelectedColor = null;
+        let lastSelectedSize = null;
+        let currentProductCode = "@Model.CodeProductDetail";
+
+        // ==== COLOR TOGGLE ====
+        colorRadios.forEach(radio => {
+            const label = radio.nextElementSibling;
+            label.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (radio.disabled) return;
+
+                if (lastSelectedColor === radio.value) {
+                    // Bỏ chọn màu hiện tại
+                    radio.checked = false;
+                    label.classList.remove('active');
+                    lastSelectedColor = null;
+                    filterSizesByColor(null);
+                    clearActiveSize(); // clear size khi bỏ chọn màu
+                    updateProductCode();
+                } else {
+                    // Chọn màu mới
+                    colorRadios.forEach(r => r.nextElementSibling.classList.remove('active'));
+                    radio.checked = true;
+                    label.classList.add('active');
+                    lastSelectedColor = radio.value;
+
+                    // === XÓA ACTIVE SIZE KHI CHỌN MÀU LẦN ĐẦU ===
+                    clearActiveSize();
+
+                    // Lọc size theo màu
+                    filterSizesByColor(radio.value);
+
+                    // Nếu size hiện tại không hợp với màu mới -> clear size
+                    const validSizes = colorSizeMap[radio.value] || [];
+                    if (lastSelectedSize && !validSizes.includes(lastSelectedSize)) {
+                        clearActiveSize();
+                    }
+
+                    updateProductCode();
+                }
+            });
+        });
+
+        // ==== SIZE TOGGLE ====
+        sizeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.classList.contains('disabled')) return;
+
+                if (lastSelectedSize === btn.dataset.size) {
+                    // Bỏ chọn size
+                    clearActiveSize();
+                    filterColorsBySize(null);
+                    updateProductCode();
+                } else {
+                    // Chọn size mới
+                    sizeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    lastSelectedSize = btn.dataset.size;
+
+                    // Lọc màu theo size
+                    filterColorsBySize(btn.dataset.size);
+
+                    // Nếu màu hiện tại không hợp với size mới -> clear màu
+                    const checkedColor = document.querySelector('.color-radio:checked');
+                    if (checkedColor && !sizeColorMap[btn.dataset.size]?.includes(checkedColor.value)) {
+                        clearActiveColor();
+                    }
+
+                    updateProductCode();
+                }
+            });
+        });
+
+        // ==== FILTER ====
+        function filterSizesByColor(colorId) {
+            const validSizes = colorId ? (colorSizeMap[colorId] || []) : [];
+            sizeButtons.forEach(btn => {
+                if (!colorId || validSizes.includes(btn.dataset.size)) {
+                    btn.classList.remove('disabled');
+                } else {
+                    btn.classList.add('disabled');
+                }
+            });
+        }
+
+        function filterColorsBySize(sizeId) {
+            const validColors = sizeId ? (sizeColorMap[sizeId] || []) : [];
+            colorRadios.forEach(radio => {
+                const label = radio.nextElementSibling;
+                if (!sizeId || validColors.includes(radio.value)) {
+                    radio.disabled = false;
+                    label.classList.remove('disabled');
+                } else {
+                    radio.disabled = true;
+                    label.classList.add('disabled');
+                }
+            });
+        }
+
+        // ==== CLEAR ACTIVE ====
+        function clearActiveSize() {
+            sizeButtons.forEach(b => b.classList.remove('active'));
+            lastSelectedSize = null;
+        }
+
+        function clearActiveColor() {
+            colorRadios.forEach(radio => {
+                radio.checked = false;
+                radio.nextElementSibling.classList.remove('active');
+            });
+            lastSelectedColor = null;
+        }
+
+        // ==== UPDATE MÃ SP ====
+        function updateProductCode() {
+            currentProductCode = "@Model.CodeProductDetail";
+            if (lastSelectedColor && lastSelectedSize) {
+                const key = `${lastSelectedColor}-${lastSelectedSize}`;
+                if (productVariantMap[key]) {
+                    currentProductCode = productVariantMap[key];
+                }
+            }
+            selectedSizeSpan.textContent = currentProductCode;
+            document.getElementById("cartProductCodeHidden").value = currentProductCode;
+            document.getElementById("cartProductCodeHiddenMuaNgay").value = currentProductCode;
+        }
+    });
+</script>

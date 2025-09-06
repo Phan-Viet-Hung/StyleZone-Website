@@ -1,0 +1,51 @@
+
+  .dt-button {
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dt-button:hover {
+    background-color: #0d6efd !important; /* Bootstrap primary */
+    color: white !important;
+    border-color: #0d6efd !important;
+  }
+  /* Ẩn chữ Search */
+.dataTables_filter label {
+  font-size: 0;
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Input tìm kiếm */
+.dataTables_filter input {
+  font-size: 14px;
+  padding: 8px 12px 8px 36px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/622/622669.png'); /* icon kính lúp */
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 16px 16px;
+  box-shadow: none;
+  width: 240px;
+}
+
+.dataTables_paginate .paginate_button:hover {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+/* Phân trang tổng thể */
+.dataTables_paginate .paginate_button.previous:hover,
+.dataTables_paginate .paginate_button.next:hover {
+  color: #007bff !important;
+  text-decoration: underline !important;
+}
+
+  .dataTables_filter input:focus {
+  background-image: none;
+  padding-left: 12px; /* bỏ khoảng trống dành cho icon */
+}
+
+

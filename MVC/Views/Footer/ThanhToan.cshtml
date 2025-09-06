@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewData["Title"] = "ThanhToan";
+    Layout = "~/Views/Shared/_LayoutChung.cshtml";
+}
+<nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-2">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active current" aria-current="page">Thanh toán</li>
+    </ol>
+</nav>
+<div class="container py-4" style="background-color: #f9f9f9;">
+    <div class="mx-auto bg-white p-4 p-md-5 shadow-sm rounded" style="max-width: 900px;">
+        <h2 class="fw-bold text-uppercase border-bottom pb-2 mb-4">CHÍNH SÁCH THANH TOÁN</h2>
+
+        <h5 class="fw-bold">I. THANH TOÁN TRẢ TRƯỚC</h5>
+        <p>
+            Quý khách có thể thanh toán bằng thẻ ATM (thẻ ngân hàng nội địa), thẻ tín dụng và các thẻ thanh toán quốc tế như
+            <strong>Visa, MasterCard, JCB, Amex…</strong>
+        </p>
+        <p>
+            Sau khi hoàn tất đơn hàng, quý khách thực hiện thanh toán trực tiếp tại hệ thống thanh toán điện tử trên website Style Zone.
+            Cổng thanh toán được tích hợp là <strong>VNPAY</strong>, đã được Ngân hàng Nhà nước Việt Nam cấp phép, đảm bảo chuẩn bảo mật cao nhất.
+        </p>
+
+        <p class="fw-semibold mt-3">Thông tin chuyển khoản:</p>
+        <ul class="mb-4">
+            <li><strong>Công ty:</strong> Công ty ABCD</li>
+            <li><strong>Số tài khoản:</strong> 2214052005</li>
+            <li><strong>Ngân hàng:</strong> BIDV - PHUONGVANTRUONG</li>
+        </ul>
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold">II. THANH TOÁN TRẢ SAU (COD)</h5>
+        <p>
+            Hình thức <strong>COD (Cash on Delivery)</strong> cho phép khách hàng thanh toán bằng tiền mặt trực tiếp cho nhân viên giao hàng sau khi kiểm tra gói hàng.
+        </p>
+        <p>
+            Nếu sản phẩm lỗi, hư hỏng hoặc không đúng, khách có thể từ chối nhận.
+            Trường hợp khách từ chối nhận hàng mà không lý do hợp lệ, quý khách vui lòng thanh toán phí hoàn hàng cho nhà cung cấp.
+        </p>
+        <p class="mb-3">
+            Với đơn hàng từ <strong>2.500.000đ</strong>, vui lòng chuyển khoản đặt cọc <strong>500.000đ</strong>.
+            Chi tiết xin liên hệ: <a href="tel:1900633083" class="fw-semibold text-decoration-none text-primary">1900633083</a>
+        </p>
+
+        <hr class="my-4" />
+
+        <h5 class="fw-bold">III. HOÀN TIỀN (Áp dụng với đơn hàng thanh toán Online)</h5>
+        <p>Style Zone sẽ hoàn tiền trong các trường hợp sau:</p>
+        <ul>
+            <li>Khách hàng muốn trả lại hàng do lỗi sản xuất và không đổi sang sản phẩm khác.</li>
+            <li>Hoàn tiền sẽ chuyển về tài khoản cá nhân khách hàng trong vòng tối đa <strong>15 ngày</strong> kể từ khi xác nhận.</li>
+        </ul>
+    </div>
+</div>

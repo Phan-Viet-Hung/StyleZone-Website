@@ -1,0 +1,208 @@
+﻿@using DAL_Empty.Models
+@model API.Domain.Request.VoucherRequest.UpdateVoucherRequest
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Sửa Voucher";
+
+    var discountTypeOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Percentage", Text = "Phần trăm" },
+        new SelectListItem { Value = "FixedAmount", Text = "Giá cố định" }
+    };
+
+    var statusOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Active", Text = "Đang áp dụng" },
+        new SelectListItem { Value = "Inactive", Text = "Chưa áp dụng" },
+        new SelectListItem { Value = "Expired", Text = "Ngừng áp dụng" }
+    };
+}
+
+@section Styles {
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(45deg, #4d9ef7, #306ac3);
+        }
+
+        input.form-control:focus, select.form-select:focus, textarea:focus {
+            border-color: #306ac3;
+            box-shadow: 0 0 0 0.1rem rgba(48, 106, 195, 0.25);
+        }
+
+        .fw-extra-bold {
+            font-weight: 800 !important;
+        }
+
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        #imagePreview {
+            max-height: 150px;
+            object-fit: cover;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+    </style>
+}
+
+<section class="edit-voucher-section">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-gradient-primary text-white text-center rounded-top-4 py-3">
+                        <h3 class="mb-0 fw-bold"><i class="lni lni-pencil-alt"></i> Sửa Voucher</h3>
+                        <p class="small mt-1 mb-0 fw-bold">Cập nhật thông tin voucher</p>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded-bottom-4">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data" novalidate>
+                            @Html.HiddenFor(m => m.Id)
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Code" class="form-label fw-semibold">Mã khuyến mãi</label>
+                                    <div class="input-group">
+                                        <input asp-for="Code" class="form-control" placeholder="Nhập hoặc tự động sinh..." />
+                                        <button class="btn btn-outline-primary" type="button" onclick="generateCode()">
+                                            <i class="bi bi-shuffle"></i> Mã ngẫu nhiên
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Code" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountType" class="form-label fw-semibold">Loại giảm giá</label>
+                                    <select asp-for="DiscountType" class="form-select" asp-items="discountTypeOptions"></select>
+                                    <span asp-validation-for="DiscountType" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="DiscountValue" class="form-label fw-semibold">Giá trị giảm</label>
+                                    <input asp-for="DiscountValue" type="number" class="form-control" />
+                                    <span asp-validation-for="DiscountValue" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="MinOrderAmount" class="form-label fw-semibold">Đơn hàng tối thiểu</label>
+                                    <input asp-for="MinOrderAmount" type="number" class="form-control" />
+                                    <span asp-validation-for="MinOrderAmount" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="TotalUsageLimit" class="form-label fw-semibold">Số lượng voucher</label>
+                                    <input asp-for="TotalUsageLimit" type="number" class="form-control" />
+                                    <span asp-validation-for="TotalUsageLimit" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="MaxUsagePerCustomer" class="form-label fw-semibold">Sử dụng tối đa / khách</label>
+                                    <input asp-for="MaxUsagePerCustomer" type="number" class="form-control" />
+                                    <span asp-validation-for="MaxUsagePerCustomer" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6" hidden>
+                                    <label asp-for="Status" class="form-label fw-semibold">Trạng thái</label>
+                                    <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="StartDate" class="form-label fw-semibold">Ngày bắt đầu</label>
+                                    <input asp-for="StartDate" type="datetime-local" class="form-control" readonly />
+                                    <span asp-validation-for="StartDate" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="EndDate" class="form-label fw-semibold">Ngày kết thúc</label>
+                                    <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="EndDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                
+                                <div class="col-md-6">
+                                    <label asp-for="ImageFile" class="form-label fw-semibold">Ảnh từ máy tính</label>
+                                    <input asp-for="ImageFile" type="file" class="form-control" id="ImageFileInput" onchange="previewImage(this)" />
+                                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-center">
+                                    <img id="imagePreview"
+                                         src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "" : $"https://localhost:7257{Model.ImageUrl}")"
+                                         alt="Preview"
+                                         style="max-height: 150px; border-radius:8px; @(string.IsNullOrEmpty(Model.ImageUrl) ? "display:none;" : "display:block;")" />
+                                </div>
+                            </div>
+                            <div class="col-md-6" hidden>
+                                <label asp-for="ImageUrl" class="form-label fw-semibold">Ảnh cũ</label>
+                                <input asp-for="ImageUrl" class="form-control" id="ImageUrl" />
+                                <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                            </div>
+
+                            
+
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
+                                <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="lni lni-arrow-left-circle"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="lni lni-save"></i> Cập nhật
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function generateCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById("Code").value = code;
+        }
+
+        const defaultImage = "https://localhost:7257" + "@Model.ImageUrl";
+
+        function previewImage(input) {
+            const fileInput = document.getElementById("ImageFileInput");
+            const preview = document.getElementById("imagePreview");
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = defaultImage;
+                preview.style.display = 'block';
+            }
+        }
+    </script>
+}

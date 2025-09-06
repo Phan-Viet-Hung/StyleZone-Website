@@ -1,0 +1,24 @@
+﻿@using API.Domain.DTOs
+@model List<ProductDetailDto>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Size</th>
+            <th>Màu</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.SizeName</td>
+                <td>@item.ColorName</td>
+                <td>@item.Price</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
